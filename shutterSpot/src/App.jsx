@@ -10,9 +10,9 @@ function App() {
   return (
     <>
        <Router>
-      <div className="App w-full h-full">
+      <div className="App w-full h-full bg-[#fff5ea]">
         <NavBar />
-        <div className="main h-[200vh]">
+        <div className="main ">
           <Routes>
             <Route path='/' element={<Home />} />
           </Routes>
