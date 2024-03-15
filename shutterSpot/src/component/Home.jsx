@@ -1,40 +1,39 @@
-import videoBG from '../assets/videos/video (1080p) (1).mp4'
+// import videoBG from '../assets/videos/video (1080p) (1).mp4'
 import imgBG1 from '../assets/imgs/man-3672010_1280.jpg'
 import imgBG2 from '../assets/imgs/new.jpg'
-import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card'
+import heroImg from '../assets/imgs/hero-imge.jpg'
+import { Button,buttonVariants } from "@/components/ui/button";
+
+
+
+
+import Footer from './Footer';
+import Instructions from './Instructions';
 
 const Home = () => {
+   
     return ( 
         <>
-        <div className=" h-full w-full">
+        <div className=" h-full w-full mb-10">
 
             {/* Hero */}
             
-        <div className=" h-[100vh] items-center flex justify-center rounded-md mx-2 my-2">
-        <video src={videoBG} autoPlay loop muted className='w-full h-full object-cover rounded-md'></video>
+        <div className=" h-[60vh] md:h-[80vh] lg:h-[100vh] items-center flex justify-center rounded-md mx-2 my-2 relative ">
+        {/* <video src={videoBG} autoPlay loop muted className='w-full h-full object-cover rounded-md'></video> */}
+            <img src={heroImg} className='bg-cover h-full w-full object-cover bg-right' alt="" />
             {/* <div className='overlay'></div> */}
-            <div className="absolute overal flex gap-3  rounded-md items-center justify-center flex-col text-white">
+            <div className="absolute md:left-[95px] overal flex gap-3 md:w-[500px] w-[300px]  rounded-md items-start justify-center flex-col text-white">
                 <div className="text flex flex-col gap-2 items-center">
-                    <h1 className="md:text-[60px] text-[30px] font-extrabold text-center max-w-[800px]">Extraordinarily natural and cultural charm</h1>
-                    <p>Exploring Kenya is unforgettable adventure</p>
+                    <h1 className="md:text-[50px] text-[30px] font-extrabold text-start max-w-[800px]">Extraordinarily natural and cultural charm</h1>
+                    <p className='text-start'>The most efficient way to book photographers for business and company photo shoots, individual portraits, vacation photographers, and more.</p>
                 </div>
-                <div className="flex gap-3 justify-center items-center rounded-3xl py-2 px-4 glass">
-                <h2>Date</h2>
-                <h2>Budget</h2>
-                <h2>Guest</h2>
-            <Button>Search</Button>
+                <div className="flex flex-col ml-5 md:ml-0 md:flex-row gap-3 justify-center items-center rounded-3xl py-2 px-4 glass">
+                <Button variant="secondary" className="px-10">QUICK BOOKING</Button>
+                <Button variant="secondary" className="px-10">SELECT LOCATION</Button>
                 </div>
             </div>         
         </div>
-        <div className="small-cards grid md:grid md:grid-cols-2 md:mx-10 lg:flex items-center justify-center gap-5 z-20 -mt-[50px]">
+        <div className="small-cards grid md:grid md:grid-cols-2 md:mx-10 lg:flex items-center justify-center gap-5 z-20 -mt-[50px] relative">
         <div className="div rounded-md shadow-lg px-20 py-4 bg-white items-center justify-center flex flex-col">
                 <h1 className="font-extrabold text-3xl">10M+</h1>
                 <p className="text-gray-600">Total Customers</p>
@@ -87,14 +86,14 @@ const Home = () => {
         
     </div>
 </div>
-
+<Instructions />
 {/* section 3 */}
         <div className=''>
             <div className='grid gap-8 grid-cols-1 lg:grid-cols-2 mt-28'>
                 <div className=' rounded-xl relative'>
                     <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={imgBG2} alt="" />
                      <div className='absolute bottom-0 text-white'>
-                     <h1>part1</h1>
+                     <h1>“ShutterSpot makes booking a pro photographer as easy as hailing an Uber.”</h1>
                      <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In quo asperiores fugit nam laborum hic vitae non quasi eos.</p>
                      </div>
                 </div>
@@ -157,59 +156,10 @@ const Home = () => {
             </div>
             
         </div>
-        {/* Part3 */}
-        <div className=' mt-28'>
-            <div className="overal grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-8">
-                <Card  className="flex flex-col justify-between shadow-lg">
-                        <CardHeader className="flex-row gap-4 items-center">
-                        <div>
-                            <CardTitle>The War</CardTitle>
-                            <CardDescription>10 mins to cook.</CardDescription>
-                        </div>
-                        </CardHeader>
-                        <CardContent>
-                            <img src={imgBG2} className='rounded-md' alt="" />
-                        <p className='mt-4'>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur asperiores maxime quas soluta quo sunt cupiditate debitis vel aspernatur quasi exercitationem, ipsa alias, veniam fugit fuga laboriosam a deserunt tempora?</p>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                        <Button>View</Button>
-                        </CardFooter>
-                </Card>
-                 <Card  className="flex flex-col justify-between shadow-lg">
-                        <CardHeader className="flex-row gap-4 items-center">
-                        <div>
-                            <CardTitle>The War</CardTitle>
-                            <CardDescription>10 mins to cook.</CardDescription>
-                        </div>
-                        </CardHeader>
-                        <CardContent>
-                            <img src={imgBG2} className='rounded-md' alt="" />
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur asperiores maxime quas soluta quo sunt cupiditate debitis vel aspernatur quasi exercitationem, ipsa alias, veniam fugit fuga laboriosam a deserunt tempora?</p>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                        <Button>View</Button>
-                        </CardFooter>
-                </Card>
-                 <Card  className="flex flex-col justify-between shadow-lg">
-                        <CardHeader className="flex-row gap-4 items-center">
-                        <div>
-                            <CardTitle>The War</CardTitle>
-                            <CardDescription>10 mins to cook.</CardDescription>
-                        </div>
-                        </CardHeader>
-                        <CardContent>
-                            <img src={imgBG2} className='rounded-md' alt="" />
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur asperiores maxime quas soluta quo sunt cupiditate debitis vel aspernatur quasi exercitationem, ipsa alias, veniam fugit fuga laboriosam a deserunt tempora?</p>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                        <Button>View</Button>
-                        </CardFooter>
-                </Card>
-            </div>
-        </div>
-        </div>
-        </div>
         
+        </div>
+        </div>
+        <Footer/>
         </>
      );
 }
