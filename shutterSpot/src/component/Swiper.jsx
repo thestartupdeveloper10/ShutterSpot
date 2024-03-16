@@ -46,7 +46,7 @@ const SwiperCarousal = () => {
           <div className="overal  flex flex-col h-full bg-white">
         <div className="images grid grid-cols-3 gap-1">
               <div className='col-span-2'>
-                  <img src={slide_image_1} className='md:h-[300px]  h-[250px] object-cover' alt="slide_image" />
+                  <img src={slide_image_1} className='md:h-[300px]  h-[250px] w-full object-cover' alt="slide_image" />
               </div>
           <div className="minor flex flex-col gap-1">
               <div className='w-full h-full'>

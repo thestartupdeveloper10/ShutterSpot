@@ -93,6 +93,10 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
+h1{
+  font-size: 40px;
+  font-family: 'Times New Roman', Times, serif;
+}
 
 /* swiper */
 *,
@@ -111,9 +115,10 @@
 }
 
 html {
-  font-size: 62.5%;
+  font-size: 72.5%;
   scroll-behavior: smooth;
 }
+
 
 @media (min-width: 1440px) {
   html {

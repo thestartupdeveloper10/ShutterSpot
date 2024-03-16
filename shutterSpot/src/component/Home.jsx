@@ -24,10 +24,10 @@ const Home = () => {
         {/* <video src={videoBG} autoPlay loop muted className='w-full h-full object-cover rounded-md'></video> */}
             <img src={heroImg} className='bg-cover h-full w-full object-cover bg-right' alt="" />
             {/* <div className='overlay'></div> */}
-            <div className="absolute md:left-[95px] left-10 overal flex gap-3 md:w-[500px] w-[300px]  rounded-md items-start justify-center flex-col text-white">
-                <div className="text flex flex-col gap-2 items-center">
+            <div className="absolute md:left-10  lg:left-[155px] left-10 overal flex gap-10 md:gap-3 md:w-[500px] w-[300px]  rounded-md items-start justify-center flex-col text-white">
+                <div className="text flex flex-col md:gap-2 gap-6 items-center">
                     <h1 className="md:text-[50px] text-[30px] font-extrabold text-start max-w-[800px]">Extraordinarily natural and cultural charm</h1>
-                    <p className='text-start'>The most efficient way to book photographers for business and company photo shoots, individual portraits, vacation photographers, and more.</p>
+                    <p className='text-start text-[15px]'>The most efficient way to book photographers for business and company photo shoots, individual portraits, vacation photographers, and more.</p>
                 </div>
                 <div className="flex flex-col md:ml-0 md:flex-row gap-3 justify-center items-center rounded-3xl py-2 px-4 glass">
                 <Button variant="secondary" className="px-10">QUICK BOOKING</Button>
@@ -36,19 +36,19 @@ const Home = () => {
             </div>         
         </div>
         <div className="small-cards grid md:grid md:grid-cols-2 md:mx-10 lg:flex items-center justify-center gap-5 z-20 -mt-[50px] relative">
-        <div className="div rounded-md shadow-lg px-20 py-4 bg-white items-center justify-center flex flex-col">
+        <div className="div px-28 py-8  rounded-md shadow-lg  bg-white items-center justify-center flex flex-col">
                 <h1 className="font-extrabold text-3xl">10M+</h1>
                 <p className="text-gray-600">Total Customers</p>
             </div>
-            <div className="div rounded-md shadow-lg px-20 py-4 bg-white items-center justify-center flex flex-col">
+            <div className="div py-8 rounded-md shadow-lg px-28  bg-white items-center justify-center flex flex-col">
                 <h1 className="font-extrabold text-3xl">10M+</h1>
                 <p className="text-gray-600">Total Customers</p>
             </div>
-            <div className="div rounded-md shadow-lg px-20 py-4 bg-white items-center justify-center flex flex-col">
+            <div className="div py-8 rounded-md shadow-lg px-28  bg-white items-center justify-center flex flex-col">
                 <h1 className="font-extrabold text-3xl">10M+</h1>
                 <p className="text-gray-600">Total Customers</p>
             </div>
-            <div className="div rounded-md shadow-lg px-20 py-4 bg-white items-center justify-center flex flex-col">
+            <div className="div py-8 rounded-md shadow-lg px-28  bg-white items-center justify-center flex flex-col">
                 <h1 className="font-extrabold text-3xl">10M+</h1>
                 <p className="text-gray-600">Total Customers</p>
             </div>
