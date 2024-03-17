@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -74,6 +75,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+
 *{
   margin: 0px;
   border: 0px;
@@ -95,7 +100,7 @@
 }
 h1{
   font-size: 40px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Lexend Deca", sans-serif;
 }
 
 /* swiper */

@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-
+import { Link } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
@@ -42,6 +42,7 @@ const SwiperCarousal = () => {
         modules={[EffectCoverflow, Pagination, Navigation]}
         className="swiper_container"
       >
+        <Link to="photographer">
         <SwiperSlide className='rounded-md'>
           <div className="overal  flex flex-col h-full bg-white">
         <div className="images grid grid-cols-3 gap-1">
@@ -78,6 +79,7 @@ const SwiperCarousal = () => {
         </div>
           </div>
         </SwiperSlide>
+        </Link>
         <SwiperSlide>
           <img src={slide_image_2} className='pic' alt="slide_image" />
         </SwiperSlide>
