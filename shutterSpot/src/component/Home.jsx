@@ -1,6 +1,5 @@
 // import videoBG from '../assets/videos/video (1080p) (1).mp4'
-import imgBG1 from '../assets/imgs/man-3672010_1280.jpg'
-import imgBG2 from '../assets/imgs/new.jpg'
+
 import heroImg from '../assets/imgs/hero-imge.jpg'
 import { Button,buttonVariants } from "@/components/ui/button";
 
@@ -12,6 +11,7 @@ import Footer from './Footer';
 import Instructions from './Instructions';
 import SwiperCarousal from './Swiper';
 import Capture from './Moments';
+import Services from './Services';
 
 const Home = () => {
    
@@ -21,7 +21,7 @@ const Home = () => {
 
             {/* Hero */}
             
-        <div className=" h-[60vh] md:h-[80vh] lg:h-[100vh] items-center flex justify-center rounded-md mx-2 my-2 relative ">
+        <div className=" h-[60vh] md:h-[70vh] lg:h-[100vh] items-center flex justify-center rounded-md mx-2 my-2 relative ">
         {/* <video src={videoBG} autoPlay loop muted className='w-full h-full object-cover rounded-md'></video> */}
             <img src={heroImg} className='bg-cover h-full w-full object-cover bg-right' alt="" />
             {/* <div className='overlay'></div> */}
@@ -69,26 +69,7 @@ const Home = () => {
             </div>
 
 {/* section 2 */}
-<div className=" mt-20">
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-        <div className='col-span-2'>
-            <img className="h-auto max-w-full rounded-lg" src={imgBG1} alt=""/>
-        </div>
-        <div className='col-span-1'>
-            <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={imgBG2} alt=""/>
-        </div>
-        
-    </div>
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-3 mt-5">
-        <div className='col-span-1'>
-            <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={imgBG2} alt=""/>
-        </div>
-        <div className='col-span-2'>
-            <img className="h-auto max-w-full rounded-lg" src={imgBG1} alt=""/>
-        </div>
-        
-    </div>
-</div>
+<Services />
 <Instructions />
 {/* section 3 */}
         <Capture />
