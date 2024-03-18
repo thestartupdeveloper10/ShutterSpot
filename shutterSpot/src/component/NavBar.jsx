@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 const NavBar = () => {
     return ( 
         <>
@@ -23,7 +24,7 @@ const NavBar = () => {
           <a href="/book" className="px-8  font-medium text-[20px] leading-7 tracking-normal  block text-white  hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Book</a>
         </li>
         <li className="py-4">
-          <a href="/gallery" className="px-8  font-medium text-[20px] leading-7 tracking-normal  block text-white  hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Gallery</a>
+          <Link to="/photographer" className="px-8  font-medium text-[20px] leading-7 tracking-normal  block text-white  hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Gallery</Link>
         </li>
         <li className="py-4">
           <a href="/about" className="px-8  font-medium text-[20px] leading-7 tracking-normal  block text-white  hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">About</a>
