@@ -12,6 +12,7 @@ import Instructions from './Instructions';
 import SwiperCarousal from './Swiper';
 import Capture from './Moments';
 import Services from './Services';
+import ShuffleHero from './ShuffleImg';
 
 const Home = () => {
    
@@ -60,9 +61,8 @@ const Home = () => {
                 <p>Best Location</p>
                 <div>
                     <div className=" flex-col md:flex md:flex-row md:gap-10 gap-5 justify-between items-start">
-                        <h1 className="text-[40px] ">Indonesian tourism</h1>
-                        <p className="flex-grow  md:pt-1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam quod harum vite.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam quod harum vite
+                        <h1 className="text-[40px] ">ShutterSpot: Your Instant Photography Connection</h1>
+                        <p className="flex-grow  md:pt-1">ShutterSpot: Your Instant Photography Connection. Discover and book talented photographers nearby in real-time. Whether it is outdoor landscapes, picnics, weddings, or more, SnapSync matches you with the perfect photographer at the touch of a button. Embrace spontaneity and bring your vision to life effortlessly.
                         </p>
                     </div>
                 </div>
@@ -77,6 +77,9 @@ const Home = () => {
          <div className='w-full'>
         < SwiperCarousal />
                 </div>
+        <div className="w-full bg-slate-500">
+        <ShuffleHero/>
+        </div>
         </div>
         </div>
         <Footer/>

@@ -8,7 +8,7 @@ import studio from '../assets/imgs/fashion-6066661_1280.jpg'
 const Photographer_Details = () => {
     return ( 
         <>
-        <div className="overal mx-8 my-8">
+        <div className="overal mx-8 my-32">
             <div className="photos grid grid-cols-7 gap-2">
                 <div className="each col-span-2 flex flex-col gap-2">
                     <div className="h-full w-full">
