@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import NavBar from "./component/NavBar"
 import Home from './component/Home';
 import Photographer_Details from './component/Phographer-Details';
+import ChipTabs from './component/NavBar';
 
 
 
@@ -13,7 +14,7 @@ function App() {
     <>
        <Router>
       <div className="App w-full h-full bg-[#fff5ea]">
-        <NavBar />
+        < ChipTabs />
         <div className="main ">
           <Routes>
             <Route path='/' element={<Home />} />
