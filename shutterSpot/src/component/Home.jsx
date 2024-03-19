@@ -18,11 +18,11 @@ const Home = () => {
    
     return ( 
         <>
-        <div className=" h-full w-full mb-10">
+        <div className=" h-full w-full mb-10 mt-24 md:mt-12">
 
             {/* Hero */}
             
-        <div className=" h-[60vh] md:h-[70vh] lg:h-[100vh] items-center flex justify-center rounded-md mx-2 my-2 relative ">
+        <div className=" h-[60dvh] md:h-[70dvh] lg:h-[100dvh] items-center flex justify-center rounded-md mx-2 my-2 relative ">
         {/* <video src={videoBG} autoPlay loop muted className='w-full h-full object-cover rounded-md'></video> */}
             <img src={heroImg} className='bg-cover h-full w-full object-cover bg-right' alt="" />
             {/* <div className='overlay'></div> */}
