@@ -103,6 +103,39 @@ h1{
   font-family: "Lexend Deca", sans-serif;
 }
 
+:root {
+  --black: #1c1c1c;
+  --gray: #7E7E7E;
+  --gray-light: #E4E4E4;
+  --red: #b30000;
+  --font-size-base: 1rem;
+  --font-size-sm: clamp(1.25rem, 0.41vw + 0.9rem, 0.98rem);
+  --font-size-md: clamp(1.25rem, 0.61vw + 1.1rem, 1.58rem);
+  --font-size-lg: clamp(1.56rem, 1vw + 1.31rem, 2.11rem);
+  --font-size-xl: clamp(1.44rem, 1.38vw + .85rem, 2.75rem);
+  --border-radius: 10px;
+}
+
+body {
+  font-family: 'Lexend Deca', sans-serif;
+  color: #2b124c;
+  font-size: var(--font-size-base);
+  
+  margin: 0;
+  padding: 0;
+
+}
+
+/* a { color: var(--black); } */
+h1{font-weight: bold;}
+h1 { font-size: var(--font-size-xl); }
+h2 { font-size: var(--font-size-lg); }
+h3 { font-size: var(--font-size-md); }
+p { font-size: var(--font-size-sm);
+color: #998e8e; }
+
+
+
 /* swiper */
 *,
 *::before,

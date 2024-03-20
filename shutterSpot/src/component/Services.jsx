@@ -12,7 +12,7 @@ const Services = () => {
             <img className=" max-w-full rounded-lg" src={imgBG1} alt=""/>
             <div className="details absolute bottom-2 px-1 mx-2 lg:bottom-28 lg:w-[500px] lg:left-20 text-white glass md:px-4 md:py-4">
                 <h1 className='text-[25px] lg:text-[40px] '>Natures Canvas</h1>
-                <p className='py-1'> From majestic mountains to serene lakes, 
+                <p className='py-1 text-[#fbe4d8]'> From majestic mountains to serene lakes, 
                 explore the wonders of nature captured through the lens of talented photographers</p>
             </div>
         </div>
@@ -21,7 +21,7 @@ const Services = () => {
             <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={studio} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
                 <h1 className='text-[25px] lg:text-[40px]  '>Studio Shoot</h1>
-                <p className='md:hidden lg:block'>
+                <p className='md:hidden lg:block text-[#fcf9f7]'>
                 Indulge in the refined elegance and sophistication of our professional studio shoots, where every image is crafted with meticulous precision.
                 </p>
             </div>
@@ -30,7 +30,7 @@ const Services = () => {
             <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={workout} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
                 <h1 className='text-[25px] lg:text-[40px]  '>Fit & Fabulous</h1>
-                <p className='md:hidden lg:block'>
+                <p className='md:hidden lg:block text-[#fcf9f7]'>
                 Ignite your passion for fitness and wellness with our inspiring collection of workout motivation, designed to empower and energize.
                 </p>
             </div>
@@ -44,7 +44,7 @@ const Services = () => {
             <img className="h-full w-full md:max-w-full rounded-lg bg-cover bg-center" src={female} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
                 <h1 className='text-[25px] lg:text-[40px]  '>Urban shoots</h1>
-                <p className='md:hidden lg:block'>
+                <p className='md:hidden lg:block text-[#fcf9f7]'>
                 Experience the vibrant tapestry of city life through the candid lens of street photography, capturing the essence of urban culture and diversity.
                 </p>
             </div>
@@ -53,7 +53,7 @@ const Services = () => {
             <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={strawbberry} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
                 <h1 className='text-[25px] lg:text-[40px]  '>Food Gallery</h1>
-                <p className='md:hidden lg:block'>
+                <p className='md:hidden lg:block text-[#fcf9f7]'>
                 Savor the artistry and flavors of culinary delights showcased in our gourmet gallery of mouthwatering food photography.
                 </p>
             </div>
@@ -63,7 +63,7 @@ const Services = () => {
             <img className="h-auto max-w-full rounded-lg" src={wedding} alt=""/>
             <div className="details absolute bottom-2 px-1 mx-2 lg:bottom-28 lg:w-[500px] lg:left-20 text-white glass md:px-4 md:py-4">
                 <h1 className='text-[25px] lg:text-[40px]  '>Love in Focus</h1>
-                <p className='py-1'> Immerse yourself in the timeless romance and heartfelt moments of weddings, beautifully preserved in each captivating photograph.</p>
+                <p className='py-1 text-[#fbe4d8]'> Immerse yourself in the timeless romance and heartfelt moments of weddings, beautifully preserved in each captivating photograph.</p>
             </div>
         </div>
         

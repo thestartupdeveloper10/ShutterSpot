@@ -37,7 +37,7 @@ const Capture = () => {
                 <div className='flex items-start flex-col bg-gray-400 px-6'>
                     <div className="header">
                         <p>Hello bitches</p>
-                        <h1 className='text-[40px] font-bold'>One click for you</h1>
+                        <h1 className=' font-bold'>One click for you</h1>
                     </div>
                     <div className="small-cards flex flex-col justify-evenly flex-grow">
                     <div className='grid grid-cols-6 rounded-md shadow-lg bg-white'>
@@ -101,8 +101,8 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5 '>
-                                <h1 className='text-[25px] font-bold leading-10'>Hand pick your top notch photographer</h1>
-                                <p className='text-[15px]'>Find the best photographers in your area, who fit in your price, time and location.
+                                <h2 className=' font-bold leading-10'>Hand pick your top notch photographer</h2>
+                                <p className=''>Find the best photographers in your area, who fit in your price, time and location.
                                 </p>
                             </div>
                             
@@ -163,8 +163,8 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5'>
-                                <h1 className='text-[25px] font-bold leading-10'>Instant booking & rapid delivery</h1>
-                                <p className='text-[15px]'>Book a photoshoot in a couple of clicks and get your photos in a few days.
+                                <h2 className=' font-bold leading-10'>Instant booking & rapid delivery</h2>
+                                <p className=''>Book a photoshoot in a couple of clicks and get your photos in a few days.
                                 </p>
                             </div>
                             
@@ -211,8 +211,8 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5'>
-                                <h1 className='text-[25px] font-bold leading-10'>Vetted photographers</h1>
-                                <p className='text-[15px]'>All photographers are carefully reviewed and approved by experts to ensure a great experience.
+                                <h2 className=' font-bold leading-10'>Vetted photographers</h2>
+                                <p className=''>All photographers are carefully reviewed and approved by experts to ensure a great experience.
                                 </p>
                             </div>
                             
@@ -250,8 +250,8 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5'>
-                                <h1 className='text-[25px] font-bold leading-10'>Satisfaction guaranteed</h1>
-                                <p className='text-[15px]'>Or we will make it right and refund your money.
+                                <h2 className=' font-bold leading-10'>Satisfaction guaranteed</h2>
+                                <p className=''>Or we will make it right and refund your money.
                                 </p>
                             </div>
                             

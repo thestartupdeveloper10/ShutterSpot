@@ -18,7 +18,7 @@ const Home = () => {
    
     return ( 
         <>
-        <div className=" h-full w-full mb-10 mt-24 md:mt-12">
+        <div className=" h-full w-full mb-10 mt-28 md:mt-12">
 
             {/* Hero */}
             
@@ -29,7 +29,7 @@ const Home = () => {
             <div className="absolute md:left-10  lg:left-[155px] left-10 overal flex gap-10 md:gap-3 md:w-[500px] w-[300px]  rounded-md items-start justify-center flex-col text-white">
                 <div className="text flex flex-col md:gap-2 gap-6 items-center">
                     <h1 className="md:text-[50px] text-[30px] font-extrabold text-start max-w-[800px]">Extraordinarily natural and cultural charm</h1>
-                    <p className='text-start text-[15px]'>The most efficient way to book photographers for business and company photo shoots, individual portraits, vacation photographers, and more.</p>
+                    <p className='text-start text-[15px] text-[#fbe4d8]'>The most efficient way to book photographers for business and company photo shoots, individual portraits, vacation photographers, and more.</p>
                 </div>
                 <div className="flex flex-col md:ml-0 md:flex-row gap-3 justify-center items-center rounded-3xl py-2 px-4 glass">
                 <Button variant="secondary" className="px-10">QUICK BOOKING</Button>
@@ -61,7 +61,7 @@ const Home = () => {
                 <p>Best Location</p>
                 <div>
                     <div className=" flex-col md:flex md:flex-row md:gap-10 gap-5 justify-between items-start">
-                        <h1 className="text-[40px] ">ShutterSpot: Your Instant Photography Connection</h1>
+                        <h2 className=" ">ShutterSpot: Your Instant Photography Connection</h2>
                         <p className="flex-grow  md:pt-1">ShutterSpot: Your Instant Photography Connection. Discover and book talented photographers nearby in real-time. Whether it is outdoor landscapes, picnics, weddings, or more, SnapSync matches you with the perfect photographer at the touch of a button. Embrace spontaneity and bring your vision to life effortlessly.
                         </p>
                     </div>

@@ -14,8 +14,8 @@ const Instructions = () => {
     return ( 
         <div className=' mt-28'>
             <div className='flex flex-col items-center justify-center mb-16'>
-                <h1 className='md:text-[60px] text-center text-[40px]'>How ShutterSpot works</h1>
-                <p className='text-center'>We have simplified the process of getting great photography. Booking a photographer through Perfocal is simple as 1, 2, 3.</p>
+                <h1 className=' text-center '>How ShutterSpot works</h1>
+                <p className='text-center'>We have simplified the process of getting great photography. Booking a photographer through ShutterSpot is simple as 1, 2, 3.</p>
             </div>
             <div className="overal grid md:grid-cols-2 lg:grid-cols-4 grid-cols-1 gap-4">
                 <Card  className="flex flex-col justify-start shadow-lg">
