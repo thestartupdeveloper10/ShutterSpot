@@ -16,8 +16,10 @@ import slide_image_4 from '../assets/imgs/fashion-6066661_1280.jpg';
 import slide_image_5 from '../assets/imgs/shoot.jpg';
 import slide_image_6 from '../assets/imgs/iphone.jpg';
 import slide_image_7 from '../assets/imgs/hero-model.jpg';
+import { Button } from '@/components/ui/button';
 
 const SwiperCarousal = () => {
+  const detail_link = '/photographer'
     return ( 
         <div className="container">
       <h1 className="heading">Top Photographers</h1>
@@ -42,44 +44,61 @@ const SwiperCarousal = () => {
         modules={[EffectCoverflow, Pagination, Navigation]}
         className="swiper_container"
       >
-        <Link to="photographer">
+        
         <SwiperSlide className='rounded-md'>
+         
+          
           <div className="overal  flex flex-col h-full bg-white">
-        <div className="images grid grid-cols-3 gap-1">
-              <div className='col-span-2'>
-                  <img src={slide_image_1} className='md:h-[300px]  h-[250px] w-full object-cover' alt="slide_image" />
-              </div>
-          <div className="minor flex flex-col gap-1">
-              <div className='w-full h-full'>
-                <div className='w-full h-full'>
-                    <img src={salmon} className='h-full object-cover' alt="slide_image" />
-                </div>
-              </div>
-              <div className='w-full h-full'>
-               <div className='w-full h-full'>
-                    <img src={wedding} className='h-full object-cover' alt="slide_image" />
-              </div>
-              </div>
-          </div>
-        </div>
-        <div className="name px-6 bg-white flex flex-col gap-5">
-          <div className='h-24 w-24 rounded-full overflow-hidden -mt-10 border-4 border-spacing-2 border-white'>
-          <img src={slide_image_1} className=' object-cover' alt="slide_image" />
-          </div>
-        <div className='flex justify-between'>
-        <div className="name flex flex-col gap-5">
-        <h1 className='text-[20px]'>rtr</h1>
-        <p className='text-[15px] pb-5'>Newyork</p>
-        </div>
-        <div className="name flex flex-col gap-5">
-        <h1 className='text-[20px]'>$124</h1>
-        <p className='text-[15px] pb-5'>5**</p>
-        </div>
-        </div>
-        </div>
-          </div>
+
+<div className="images grid grid-cols-3 gap-1">
+       <div className='col-span-2'>
+           <img src={slide_image_1} className='md:h-[300px]  h-[250px] w-full object-cover' alt="slide_image" />
+       </div>
+   <div className="minor flex flex-col gap-1">
+       <div className='w-full h-full'>
+         <div className='w-full h-full'>
+             <img src={salmon} className='h-full object-cover' alt="slide_image" />
+         </div>
+       </div>
+       <div className='w-full h-full'>
+        <div className='w-full h-full'>
+             <img src={wedding} className='h-full object-cover' alt="slide_image" />
+       </div>
+       </div>
+   </div>
+ </div>
+
+ <div className="name px-6 bg-white flex flex-col gap-5">
+   <div className='h-24 w-24 rounded-full overflow-hidden -mt-10 border-4 border-spacing-2 border-white'>
+   <img src={slide_image_1} className=' object-cover' alt="slide_image" />
+   </div>
+   <div className="flex flex-col">
+   <div className='flex justify-between'>
+ <div className="name flex flex-col gap-5">
+ <h1 className='text-[20px]'>Cliffe Ibande</h1>
+ <p className='text-[15px] pb-5'>Newyork</p>
+ </div>
+ <div className="name flex flex-col gap-5">
+ <h1 className='text-[20px]'>$124</h1>
+ <p className='text-[15px] pb-5'>5**</p>
+ </div>
+ </div>
+ <div className="name flex items-center justify-center bg-blue-700">
+ <Link to={detail_link}>
+ < Button>View Details</Button>
+ </Link>
+ </div>
+   </div>
+
+ </div>
+   </div>
+         
+         
+          
+          
+          
         </SwiperSlide>
-        </Link>
+        
         <SwiperSlide>
           <img src={slide_image_2} className='pic' alt="slide_image" />
         </SwiperSlide>

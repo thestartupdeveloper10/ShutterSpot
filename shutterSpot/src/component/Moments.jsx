@@ -34,7 +34,7 @@ const Capture = () => {
                         </div>
                     </div>
                 </div>
-                <div className='flex items-start flex-col bg-gray-400 px-6'>
+                <div className='flex items-start flex-col bg-[#f9f6ee] px-6 py-6'>
                     <div className="header">
                         <p>Hello bitches</p>
                         <h1 className=' font-bold'>One click for you</h1>
@@ -101,7 +101,7 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5 '>
-                                <h2 className=' font-bold leading-10'>Hand pick your top notch photographer</h2>
+                                <h2 className=' leading-10'>Hand pick your top notch photographer</h2>
                                 <p className=''>Find the best photographers in your area, who fit in your price, time and location.
                                 </p>
                             </div>
@@ -163,7 +163,7 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5'>
-                                <h2 className=' font-bold leading-10'>Instant booking & rapid delivery</h2>
+                                <h2 className=' leading-10'>Instant booking & rapid delivery</h2>
                                 <p className=''>Book a photoshoot in a couple of clicks and get your photos in a few days.
                                 </p>
                             </div>
@@ -211,7 +211,7 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5'>
-                                <h2 className=' font-bold leading-10'>Vetted photographers</h2>
+                                <h2 className=' leading-10'>Vetted photographers</h2>
                                 <p className=''>All photographers are carefully reviewed and approved by experts to ensure a great experience.
                                 </p>
                             </div>
@@ -250,7 +250,7 @@ const Capture = () => {
                                 </h1>
                             </div>
                             <div className='flex flex-col py-4 px-2 justify-center items-start gap-3 col-span-5'>
-                                <h2 className=' font-bold leading-10'>Satisfaction guaranteed</h2>
+                                <h2 className=' leading-10'>Satisfaction guaranteed</h2>
                                 <p className=''>Or we will make it right and refund your money.
                                 </p>
                             </div>

@@ -61,7 +61,7 @@ const Home = () => {
                 <p>Best Location</p>
                 <div>
                     <div className=" flex-col md:flex md:flex-row md:gap-10 gap-5 justify-between items-start">
-                        <h2 className=" ">ShutterSpot: Your Instant Photography Connection</h2>
+                        <h2 className=" font-bold ">ShutterSpot: Your Instant Photography Connection</h2>
                         <p className="flex-grow  md:pt-1">ShutterSpot: Your Instant Photography Connection. Discover and book talented photographers nearby in real-time. Whether it is outdoor landscapes, picnics, weddings, or more, SnapSync matches you with the perfect photographer at the touch of a button. Embrace spontaneity and bring your vision to life effortlessly.
                         </p>
                     </div>
@@ -77,7 +77,7 @@ const Home = () => {
          <div className='w-full'>
         < SwiperCarousal />
                 </div>
-        <div className="w-full bg-slate-500">
+        <div className="w-full bg-[#fffff0]">
         <ShuffleHero/>
         </div>
         </div>

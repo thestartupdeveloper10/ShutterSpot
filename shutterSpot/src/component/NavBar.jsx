@@ -14,7 +14,7 @@ const ChipTabs = () => {
   const [selected, setSelected] = useState(tabs[0].text);
 
   return (
-    <div className="px-24  py-14 text-white glass bg-slate-900 justify-center md:justify-between flex items-center flex-wrap gap-2 fixed z-50 w-full top-0">
+    <div className="px-24  py-10 text-white glass bg-[#46332e] justify-center md:justify-between flex items-center flex-wrap gap-2 fixed z-50 w-full top-0">
       <div className="">
         <h1 className="text-[18px]">ShutterSport</h1>
       </div>
