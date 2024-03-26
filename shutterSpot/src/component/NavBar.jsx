@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import PropTypes from "prop-types"; 
 import { Link } from "react-router-dom";// Import PropTypes
+import { Button,buttonVariants } from "@/components/ui/button";
 
 const tabs = [
   { text: "Home", link: "/" },
@@ -30,7 +31,9 @@ const ChipTabs = () => {
       ))}
      </div>
        <div>
-        <p>ShutterSport</p>
+          <Link to="/login">
+         < Button>Login</Button>
+    </Link>
       </div>
     </div>
   );
