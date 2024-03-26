@@ -13,7 +13,7 @@ import Instructions from './Instructions';
 import SwiperCarousal from './Swiper';
 import Capture from './Moments';
 import Services from './Services';
-// import Formbook from './book_Form';
+
 
 
 const Home = () => {

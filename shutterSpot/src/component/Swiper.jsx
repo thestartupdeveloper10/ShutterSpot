@@ -85,7 +85,7 @@ const SwiperCarousal = () => {
  </div>
  <div className="name flex items-center justify-center bg-blue-700">
  <Link to={detail_link}>
- < Button>View Details</Button>
+ < Button >View Details</Button>
  </Link>
  </div>
    </div>

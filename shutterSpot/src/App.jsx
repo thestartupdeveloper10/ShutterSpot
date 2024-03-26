@@ -6,10 +6,6 @@ import Book from './component/book';
 
 
 
-
-
-
-
 function App() {
  
 
