@@ -2,6 +2,7 @@
 
 import heroImg from '../assets/imgs/hero-imge.jpg'
 import { Button,buttonVariants } from "@/components/ui/button";
+import { Link } from 'react-router-dom';
 
 
 
@@ -12,7 +13,8 @@ import Instructions from './Instructions';
 import SwiperCarousal from './Swiper';
 import Capture from './Moments';
 import Services from './Services';
-import ShuffleHero from './ShuffleImg';
+// import Formbook from './book_Form';
+
 
 const Home = () => {
    
@@ -32,7 +34,9 @@ const Home = () => {
                     <p className='text-start text-[15px] text-[#fbe4d8]'>The most efficient way to book photographers for business and company photo shoots, individual portraits, vacation photographers, and more.</p>
                 </div>
                 <div className="flex flex-col md:ml-0 md:flex-row gap-3 justify-center items-center rounded-3xl py-2 px-4 glass">
+                <Link to="/book">             
                 <Button variant="secondary" className="px-10">QUICK BOOKING</Button>
+                </Link>
                 <Button variant="secondary" className="px-10">SELECT LOCATION</Button>
                 </div>
             </div>         
@@ -77,9 +81,7 @@ const Home = () => {
          <div className='w-full'>
         < SwiperCarousal />
                 </div>
-        <div className="w-full bg-[#fffff0]">
-        <ShuffleHero/>
-        </div>
+      
         </div>
         </div>
         <Footer/>
