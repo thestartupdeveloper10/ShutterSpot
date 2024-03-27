@@ -3,6 +3,7 @@ import Home from './component/Home';
 import Photographer_Details from './component/Phographer-Details';
 import ChipTabs from './component/NavBar';
 import Book from './component/book';
+import UserLogin from './component/userLogin';
 
 
 
@@ -19,6 +20,7 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path='/photographer' element={<Photographer_Details />} />
             <Route path='/book' element={< Book/>} />
+            <Route path='/login' element={< UserLogin/> } />
           </Routes>
         </div>
       </div>
