@@ -51,16 +51,16 @@ const Formbook = () => {
     const form = useForm({resolver: zodResolver(FormSchema),defaultValues: {username: "",},})
     return ( 
         <>
-          <div className="bg-yellow-300 flex items-center justify-center py-10">
+          <div className=" flex items-center justify-center py-10">
           <Form {...form}>
-      <form  className="w-[400px] bg-slate-400 py-10 rounded-md space-y-6 flex items-center justify-center flex-col">
+      <form  className="w-[400px] lg:bg-gray-300 glass py-10 px-4 rounded-md space-y-6 flex items-center justify-center flex-col">
       <h3 className="text-4xl md:text-4xl text-center font-semibold">
         Book Photographers in
         Your Style & Budget
         </h3>
         <div>
         <Select>
-      <SelectTrigger className="w-[350px] h-20 text-[15px]">
+      <SelectTrigger className="lg:w-[350px] w-[290px] h-20 text-[15px]">
         <SelectValue placeholder="Select a timezone" />
       </SelectTrigger>
       <SelectContent>
@@ -125,7 +125,7 @@ const Formbook = () => {
         <Button
           variant={"outline"}
           className={cn(
-            "w-[350px] h-20 justify-start text-left font-normal",
+            "lg:w-[350px] w-[290px] h-20 justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
@@ -155,7 +155,7 @@ const Formbook = () => {
       </PopoverContent>
     </Popover>
      </div>
-        <div className="w-[350px]">
+        <div className="lg:w-[350px] w-[290px]">
         <FormField
           control={form.control}
           name="username"
@@ -169,7 +169,7 @@ const Formbook = () => {
              )}
             />
         </div>
-       <div className="bg-blue-500 w-[350px] h-20 flex justify-center items-center text-[15px]">
+       <div className="bg-blue-500 lg:w-[350px] w-[290px] h-20 flex justify-center items-center text-[15px]">
        <Button type="submit">Find Your Photographer</Button>
        </div>
       </form>

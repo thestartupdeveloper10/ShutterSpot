@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Formbook from './book_Form';
+import ChooseBook from "./chooseBook";
+import Footer from "./Footer";
 
 const ShuffleHero = () => {
   return (
-    <section className="w-full px-8 py-12 grid grid-cols-1 md:grid-cols-2 items-center gap-8 max-w-8xl mx-auto">
-      <div className="bg-pink-200">
+    <div className="w-full">
+      <section className="w-full h-full bg-[#fbe4d8] px-8 py-2 grid grid-cols-1 md:grid-cols-2 items-center gap-8 max-w-8xl mx-auto">
+      <div className="">
        
         {/* <p className="text-base md:text-lg text-slate-700 my-4 md:my-6">
         Dive into an ever-changing world of visual inspiration with our dynamic photo gallery. From breathtaking landscapes to captivating portraits, explore a diverse range of images that continually refresh and inspire. Immerse yourself in the beauty of photography, where every visit unveils new perspectives and endless possibilities.
@@ -17,6 +20,14 @@ const ShuffleHero = () => {
       </div>
       <ShuffleGrid />
     </section>
+    <div>
+      < ChooseBook/>
+    </div>
+    <div className="w-full mt-10">
+    <Footer/>
+    </div>
+    </div>
+    
   );
 };
 
