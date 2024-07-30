@@ -1,18 +1,15 @@
 // import videoBG from '../assets/videos/video (1080p) (1).mp4'
 
-import heroImg from '../assets/imgs/hero-imge.jpg'
-import { Button,buttonVariants } from "@/components/ui/button";
+import heroImg from '../../assets/imgs/hero/hero-imge.jpg'
+import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
-
-
-
-
-
-import Footer from './Footer';
-import Instructions from './Instructions';
-import SwiperCarousal from './Swiper';
-import Capture from './Moments';
-import Services from './Services';
+import Footer from '../../component/Footer';
+import Instructions from '../../component/Instructions';
+import SwiperCarousal from '../../component/Swiper';
+import Capture from '../../component/Moments';
+import Services from '../../component/Services';
+import NavBar from '../../component/NavBar';
+import InfoCard from './InfoCard';
 
 
 
@@ -20,11 +17,10 @@ const Home = () => {
    
     return ( 
         <>
-        <div className=" h-full w-full mb-10 mt-28 md:mt-12">
-
-            {/* Hero */}
-            
-        <div className=" h-[60dvh] md:h-[70dvh] lg:h-[100dvh] items-center flex justify-center rounded-md mx-2 my-2 relative ">
+        <div className="mt-28 md:mt-12">
+                <NavBar/>
+        <div>    
+        <div className=" h-[60dvh] md:h-[70dvh] lg:h-[100dvh] items-center flex justify-center rounded-md my-2 relative ">
         {/* <video src={videoBG} autoPlay loop muted className='w-full h-full object-cover rounded-md'></video> */}
             <img src={heroImg} className='bg-cover h-full w-full object-cover bg-right' alt="" />
             {/* <div className='overlay'></div> */}
@@ -42,22 +38,10 @@ const Home = () => {
             </div>         
         </div>
         <div className="small-cards grid md:grid md:grid-cols-2 md:mx-10 lg:flex items-center justify-center gap-5 z-20 -mt-[50px] relative">
-        <div className="div px-28 py-8  rounded-md shadow-lg  bg-white items-center justify-center flex flex-col">
-                <h1 className="font-extrabold text-3xl">10M+</h1>
-                <p className="text-gray-600">Total Customers</p>
-            </div>
-            <div className="div py-8 rounded-md shadow-lg px-28  bg-white items-center justify-center flex flex-col">
-                <h1 className="font-extrabold text-3xl">10M+</h1>
-                <p className="text-gray-600">Total Customers</p>
-            </div>
-            <div className="div py-8 rounded-md shadow-lg px-28  bg-white items-center justify-center flex flex-col">
-                <h1 className="font-extrabold text-3xl">10M+</h1>
-                <p className="text-gray-600">Total Customers</p>
-            </div>
-            <div className="div py-8 rounded-md shadow-lg px-28  bg-white items-center justify-center flex flex-col">
-                <h1 className="font-extrabold text-3xl">10M+</h1>
-                <p className="text-gray-600">Total Customers</p>
-            </div>
+                <InfoCard/>
+                <InfoCard/>
+                <InfoCard/>
+                <InfoCard/>
         </div>
         {/* page2 */}
         <div className=" md:mx-24 mx-5 mt-20">
@@ -66,7 +50,7 @@ const Home = () => {
                 <div>
                     <div className=" flex-col md:flex md:flex-row md:gap-10 gap-5 justify-between items-start">
                         <h2 className=" font-bold ">ShutterSpot: Your Instant Photography Connection</h2>
-                        <p className="flex-grow  md:pt-1">ShutterSpot: Your Instant Photography Connection. Discover and book talented photographers nearby in real-time. Whether it is outdoor landscapes, picnics, weddings, or more, SnapSync matches you with the perfect photographer at the touch of a button. Embrace spontaneity and bring your vision to life effortlessly.
+                        <p className="flex-grow  md:pt-1">Discover and book talented photographers nearby in real-time. Whether it is outdoor landscapes, picnics, weddings, or more, SnapSync matches you with the perfect photographer at the touch of a button. Embrace spontaneity and bring your vision to life effortlessly.
                         </p>
                     </div>
                 </div>
@@ -85,6 +69,8 @@ const Home = () => {
         </div>
         </div>
         <Footer/>
+        </div>
+        
         </>
      );
 }

@@ -1,13 +1,17 @@
-import imgBG1 from '../assets/imgs/couple-landscape.jpg'
-import strawbberry from '../assets/imgs/strawberry.jpg'
-import wedding from '../assets/imgs/wedding.jpg'
-import female from '../assets/imgs/beautiful-2637484_1280.jpg'
-import workout from '../assets/imgs/man-gym.jpg'
-import studio from '../assets/imgs/fashion-6066661_1280.jpg'
+import imgBG1 from '../../assets/imgs/couples/couple-landscape.jpg'
+import strawbberry from '../../assets/imgs/food/pancakes-2291908_1280.jpg'
+import wedding from '../../assets/imgs/wedding/wedding.jpg'
+import female from '../../assets/imgs/Fmodels/beautiful-2910261_1280.jpg'
+// import workout from '../assets/imgs/Mmodels/man-gym.jpg'
+import studio from '../../assets/imgs/Fmodels/fashion-6066661_1280.jpg'
+import Footer from '@/component/Footer'
+import NavBar from '@/component/NavBar'
 
 const Photographer_Details = () => {
     return ( 
         <>
+        <div className="mt-[165px] md:mt-32">
+            <NavBar/>
         <div className="overal mx-8 mt-[165px] md:mt-24">
             <div className="photos grid grid-cols-7 gap-2">
                 <div className="each col-span-2 flex flex-col gap-2">
@@ -157,6 +161,8 @@ const Photographer_Details = () => {
                 </div>
             </div>
           </div>
+        </div>
+        <Footer/>
         </div>
         </>
      );

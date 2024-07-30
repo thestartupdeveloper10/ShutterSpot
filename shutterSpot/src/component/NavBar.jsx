@@ -2,22 +2,24 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import PropTypes from "prop-types"; 
 import { Link } from "react-router-dom";// Import PropTypes
-import { Button,buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 const tabs = [
   { text: "Home", link: "/" },
   { text: "Shoot", link: "/photographer" },
   { text: "About", link: "/about" },
-  { text: "FAQ", link: "/faq" }
 ];
 
-const ChipTabs = () => {
+const NavBar = () => {
   const [selected, setSelected] = useState(tabs[0].text);
 
   return (
     <div className="px-24  py-10 text-white glass bg-[#46332e] justify-center md:justify-between flex items-center flex-wrap gap-2 fixed z-50 w-full top-0">
       <div className="">
+        <Link to='/'>
         <h1 className="text-[18px]">ShutterSport</h1>
+        </Link>
+       
       </div>
      <div className="flex gap-5">
      {tabs.map((tab) => (
@@ -76,4 +78,4 @@ Chip.propTypes = {
   setSelected: PropTypes.func.isRequired,
 };
 
-export default ChipTabs;
+export default NavBar;

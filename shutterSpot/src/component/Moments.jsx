@@ -1,9 +1,9 @@
-import dog from '../assets/imgs/dog.jpg'
-import kid from '../assets/imgs/kid.jpg'
-import couple from '../assets/imgs/couple-wedding.jpg'
-import family from '../assets/imgs/family.jpg'
-import man from '../assets/imgs/man-potraite.jpg'
-import bike from '../assets/imgs/bike.jpg'
+import dog from '../assets/imgs/others/dog.jpg'
+import kid from '../assets/imgs/kids/kid.jpg'
+import couple from '../assets/imgs/couples/couple-wedding.jpg'
+import family from '../assets/imgs/couples/family.jpg'
+import man from '../assets/imgs/Mmodels/man-potraite.jpg'
+import bike from '../assets/imgs/others/bike.jpg'
 
 
 const Capture = () => {

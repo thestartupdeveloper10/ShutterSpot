@@ -1,9 +1,9 @@
-import imgBG1 from '../assets/imgs/couple-landscape.jpg'
-import strawbberry from '../assets/imgs/strawberry.jpg'
-import wedding from '../assets/imgs/wedding.jpg'
-import female from '../assets/imgs/beautiful-2637484_1280.jpg'
-import workout from '../assets/imgs/man-gym.jpg'
-import studio from '../assets/imgs/fashion-6066661_1280.jpg'
+import imgBG1 from '../assets/imgs/couples/couple-landscape.jpg'
+import strawbberry from '../assets/imgs/food/hamburger-1238246_1280.jpg'
+import wedding from '../assets/imgs/wedding/bride-1255520_1280.jpg'
+import female from '../assets/imgs/streets/nike-5126389_1280.jpg'
+import workout from '../assets/imgs/Mmodels/man-gym.jpg'
+import studio from '../assets/imgs/Fmodels/fashion-6066661_1280.jpg'
 const Services = () => {
     return ( 
         <div className=" mt-20">

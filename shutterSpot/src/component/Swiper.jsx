@@ -7,15 +7,15 @@ import 'swiper/css/navigation';
 
 import { EffectCoverflow, Pagination, Navigation } from 'swiper/modules';
 
-import slide_image_1 from '../assets/imgs/front-man.jpg';
-import salmon from '../assets/imgs/salmon.jpg';
-import wedding from '../assets/imgs/wedding.jpg';
-import slide_image_2 from '../assets/imgs/man-3672010_1280.jpg';
-import slide_image_3 from '../assets/imgs/hero-imge.jpg';
-import slide_image_4 from '../assets/imgs/fashion-6066661_1280.jpg';
-import slide_image_5 from '../assets/imgs/shoot.jpg';
-import slide_image_6 from '../assets/imgs/iphone.jpg';
-import slide_image_7 from '../assets/imgs/hero-model.jpg';
+import slide_image_1 from '../assets/imgs/Mmodels/front-man.jpg';
+import salmon from '../assets/imgs/food/salmon.jpg';
+import wedding from '../assets/imgs/wedding/wedding.jpg';
+import slide_image_2 from '../assets/imgs/Mmodels/man-2911330_1280.jpg';
+import slide_image_3 from '../assets/imgs/Mmodels/man-3672010_1280.jpg';
+import slide_image_4 from '../assets/imgs/Mmodels/man-2911330_1280.jpg';
+import slide_image_5 from '../assets/imgs/streets/shoot.jpg';
+import slide_image_6 from '../assets/imgs/others/iphone.jpg';
+import slide_image_7 from '../assets/imgs/hero/hero-model.jpg';
 import { Button } from '@/components/ui/button';
 
 const SwiperCarousal = () => {

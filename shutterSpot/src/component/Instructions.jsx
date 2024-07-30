@@ -4,11 +4,11 @@ import {
     CardDescription, 
     CardTitle 
   } from '@/components/ui/card'
-  import imgBG2 from '../assets/imgs/new.jpg'
-  import iphoneImg from '../assets/imgs/iphone.jpg'
-  import shootImg from '../assets/imgs/shoot.jpg'
-  import photoeditImg from '../assets/imgs/photo-editing.jpg'
-  import frameImg from '../assets/imgs/frame.jpg'
+  import imgBG2 from '../assets/imgs/others/new.jpg'
+  import iphoneImg from '../assets/imgs/others/iphone.jpg'
+  import shootImg from '../assets/imgs/streets/shoot.jpg'
+  import photoeditImg from '../assets/imgs/others/photo-editing.jpg'
+  import frameImg from '../assets/imgs/others/frame.jpg'
   import { Button } from "@/components/ui/button";
 const Instructions = () => {
     return ( 

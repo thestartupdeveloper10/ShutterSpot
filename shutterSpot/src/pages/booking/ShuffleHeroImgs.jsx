@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import Formbook from './book_Form';
+import Formbook from '../../component/book_Form';
 import ChooseBook from "./chooseBook";
-import Footer from "./Footer";
 
-const ShuffleHero = () => {
+
+const ShuffleHeroImgs = () => {
   return (
     <div className="w-full">
       <section className="w-full h-full bg-[#fbe4d8] px-8 py-2 grid grid-cols-1 md:grid-cols-2 items-center gap-8 max-w-8xl mx-auto">
@@ -23,9 +23,7 @@ const ShuffleHero = () => {
     <div>
       < ChooseBook/>
     </div>
-    <div className="w-full mt-10">
-    <Footer/>
-    </div>
+    
     </div>
     
   );
@@ -153,4 +151,4 @@ const ShuffleGrid = () => {
   );
 };
 
-export default ShuffleHero;
+export default ShuffleHeroImgs;

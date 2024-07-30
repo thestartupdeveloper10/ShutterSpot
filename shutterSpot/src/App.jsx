@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './component/Home';
-import Photographer_Details from './component/Phographer-Details';
-import ChipTabs from './component/NavBar';
-import Book from './component/book';
-import UserLogin from './component/userLogin';
+import Home from './pages/home/Home';
+import Photographer_Details from './pages/photographer_details/Phographer-Details';
+import Book from './pages/booking/book';
+import UserLogin from './pages/userLogin';
+import UserRegister from './pages/userRegister';
+
 
 
 
@@ -14,13 +15,13 @@ function App() {
     <>
        <Router>
       <div className="App w-full h-full bg-[#fbe4d8]">
-        < ChipTabs />
         <div className="main">
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/photographer' element={<Photographer_Details />} />
             <Route path='/book' element={< Book/>} />
             <Route path='/login' element={< UserLogin/> } />
+            <Route path='/register' element={< UserRegister/> } />
           </Routes>
         </div>
       </div>

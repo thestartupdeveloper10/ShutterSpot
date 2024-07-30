@@ -51,7 +51,7 @@ const Formbook = () => {
     const form = useForm({resolver: zodResolver(FormSchema),defaultValues: {username: "",},})
     return ( 
         <>
-          <div className=" flex items-center justify-center py-10">
+          <div className=" flex items-center justify-center mt-10 md:mt-0 py-10">
           <Form {...form}>
       <form  className="w-[400px] lg:bg-gray-300 glass py-10 px-4 rounded-md space-y-6 flex items-center justify-center flex-col">
       <h3 className="text-4xl md:text-4xl text-center font-semibold">
