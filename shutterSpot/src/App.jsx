@@ -3,6 +3,7 @@ import Home from './pages/home/Home';
 import Photographer_Details from './pages/photographer_details/Phographer-Details';
 import Book from './pages/booking/book';
 import AuthPage from './pages/auth/AuthPage';
+import PhotographersListingPage from './pages/all_photographers/PhotographersListingPage';
 
 
 
@@ -19,6 +20,7 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path='/photographer' element={<Photographer_Details />} />
             <Route path='/book' element={< Book/>} />
+            <Route path='/all_photographers' element={<PhotographersListingPage/> } />
             <Route path='/login' element={<AuthPage/> } />
           </Routes>
         </div>

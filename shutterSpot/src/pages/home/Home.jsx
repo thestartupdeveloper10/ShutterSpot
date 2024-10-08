@@ -33,7 +33,9 @@ const Home = () => {
                 <Link to="/book">             
                 <Button variant="secondary" className="px-10">QUICK BOOKING</Button>
                 </Link>
-                <Button variant="secondary" className="px-10">SELECT LOCATION</Button>
+                <Link to="/all_photographers">
+                <Button variant="secondary" className="px-10">SCHEDULE SHOOT</Button>
+                </Link>
                 </div>
             </div>         
         </div>
