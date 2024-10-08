@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 import Footer from '../../component/Footer';
 import Instructions from '../../component/Instructions';
-import SwiperCarousal from '../../component/Swiper';
+import PhotographerCarousel from '../../component/Swiper';
 import Capture from '../../component/Moments';
 import Services from '../../component/Services';
 import NavBar from '../../component/NavBar';
-import InfoCard from './InfoCard';
+import InfoCardGrid from './InfoCard';
 
 
 
 const Home = () => {
+
+
    
     return ( 
         <>
@@ -21,9 +23,7 @@ const Home = () => {
                 <NavBar/>
         <div>    
         <div className=" h-[60dvh] md:h-[70dvh] lg:h-[100dvh] items-center flex justify-center rounded-md my-2 relative ">
-        {/* <video src={videoBG} autoPlay loop muted className='w-full h-full object-cover rounded-md'></video> */}
-            <img src={heroImg} className='bg-cover h-full w-full object-cover bg-right' alt="" />
-            {/* <div className='overlay'></div> */}
+            <img src='https://cdn.pixabay.com/photo/2022/05/22/16/34/woman-7213852_960_720.jpg' className='bg-cover h-full w-full object-cover bg-right' alt="" />
             <div className="absolute md:left-10  lg:left-[155px] left-10 overal flex gap-10 md:gap-3 md:w-[500px] w-[300px]  rounded-md items-start justify-center flex-col text-white">
                 <div className="text flex flex-col md:gap-2 gap-6 items-center">
                     <h1 className="md:text-[50px] text-[30px] font-extrabold text-start max-w-[800px]">Extraordinarily natural and cultural charm</h1>
@@ -37,12 +37,7 @@ const Home = () => {
                 </div>
             </div>         
         </div>
-        <div className="small-cards grid md:grid md:grid-cols-2 md:mx-10 lg:flex items-center justify-center gap-5 z-20 -mt-[50px] relative">
-                <InfoCard/>
-                <InfoCard/>
-                <InfoCard/>
-                <InfoCard/>
-        </div>
+        <InfoCardGrid/>
         {/* page2 */}
         <div className=" md:mx-24 mx-5 mt-20">
             <div className="intro flex flex-col gap-5">
@@ -60,16 +55,16 @@ const Home = () => {
 <Services />
 <Instructions />
 {/* section 3 */}
-        <Capture />
-         {/* swiper */}
-         <div className='w-full'>
-        < SwiperCarousal />
-                </div>
+<Capture />
+{/* swiper */}
+<div className='w-full'>
+< PhotographerCarousel />
+</div>
       
-        </div>
-        </div>
-        <Footer/>
-        </div>
+</div>
+</div>
+<Footer/>
+</div>
         
         </>
      );
