@@ -11,11 +11,11 @@ import Footer from '@/component/Footer';
 
 // Mock data for photographers
 const mockPhotographers = [
-  { id: 1, name: "Alice Johnson", region: "New York", price: 150, availability: ["Weekends"], types: ["Wedding", "Portrait"], imageUrl: "/api/placeholder/300/200" },
-  { id: 2, name: "Bob Smith", region: "Los Angeles", price: 200, availability: ["Weekdays", "Weekends"], types: ["Fashion", "Event"], imageUrl: "/api/placeholder/300/200" },
-  { id: 3, name: "Charlie Brown", region: "Chicago", price: 175, availability: ["Weekdays"], types: ["Landscape", "Architecture"], imageUrl: "/api/placeholder/300/200" },
-  { id: 4, name: "Diana Ross", region: "Miami", price: 225, availability: ["Weekends"], types: ["Wedding", "Fashion"], imageUrl: "/api/placeholder/300/200" },
-  { id: 5, name: "Ethan Hunt", region: "Seattle", price: 160, availability: ["Weekdays", "Weekends"], types: ["Portrait", "Event"], imageUrl: "/api/placeholder/300/200" },
+  { id: 1, name: "Alice Johnson", region: "New York", price: 150, availability: ["Weekends"], types: ["Wedding", "Portrait"], imageUrl: "https://cdn.pixabay.com/photo/2020/01/07/23/01/sketch-4748895_1280.jpg" },
+  { id: 2, name: "Bob Smith", region: "Los Angeles", price: 200, availability: ["Weekdays", "Weekends"], types: ["Fashion", "Event"], imageUrl: "https://cdn.pixabay.com/photo/2019/12/04/09/30/man-4672229_1280.jpg" },
+  { id: 3, name: "Charlie Brown", region: "Chicago", price: 175, availability: ["Weekdays"], types: ["Landscape", "Architecture"], imageUrl: "https://cdn.pixabay.com/photo/2016/09/24/03/20/man-1690965_1280.jpg" },
+  { id: 4, name: "Diana Ross", region: "Miami", price: 225, availability: ["Weekends"], types: ["Wedding", "Fashion"], imageUrl: "https://cdn.pixabay.com/photo/2019/09/01/10/13/portrait-4444764_1280.jpg" },
+  { id: 5, name: "Ethan Hunt", region: "Seattle", price: 160, availability: ["Weekdays", "Weekends"], types: ["Portrait", "Event"], imageUrl: "https://cdn.pixabay.com/photo/2018/04/27/03/50/portrait-3353699_1280.jpg" },
 ];
 
 const regions = ["New York", "Los Angeles", "Chicago", "Miami", "Seattle"];
@@ -56,9 +56,9 @@ const PhotographersListingPage = () => {
   }, [priceRange, selectedRegion, selectedAvailability, selectedTypes]);
 
   return (
-    <div className="mt-28 md:mt-12">
+    <div className="pt-28 md:mt-12">
         <NavBar/>
-    <div className=" mx-auto px-4 ">
+    <div className=" mx-auto  pt-28  px-4">
       <h1 className="text-3xl font-bold mb-6">Find a Photographer</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -150,10 +150,10 @@ const PhotographersListingPage = () => {
         </div>
 
         {/* Photographers Grid */}
-        <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
           {filteredPhotographers.map(photographer => (
             <Card key={photographer.id}>
-              <img src={photographer.imageUrl} alt={photographer.name} className="w-full h-48 object-cover" />
+              <img src={photographer.imageUrl} alt={photographer.name} className="w-full h-80 object-cover" />
               <CardContent className="p-4">
                 <h3 className="text-lg font-semibold">{photographer.name}</h3>
                 <p className="text-sm text-gray-600">{photographer.region}</p>
