@@ -4,6 +4,8 @@ import Photographer_Details from './pages/photographer_details/Phographer-Detail
 import Book from './pages/booking/book';
 import AuthPage from './pages/auth/AuthPage';
 import PhotographersListingPage from './pages/all_photographers/PhotographersListingPage';
+import PhotographerDashboard from './pages/photographer_dashboard/PhotographerDashboard';
+import PhotographerDetailsPage from './pages/photographer_dashboard/PhotographerDetailsPage';
 
 
 
@@ -20,8 +22,10 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path='/photographer' element={<Photographer_Details />} />
             <Route path='/book' element={< Book/>} />
-            <Route path='/all_photographers' element={<PhotographersListingPage/> } />
-            <Route path='/login' element={<AuthPage/> } />
+            <Route path='/find-photographer' element={<PhotographersListingPage/> } />
+            <Route path='/auth' element={<AuthPage/> } />
+            <Route path='/photographer-dashboard' element={<PhotographerDashboard/> } />
+            <Route path='/photographerDetails' element={<PhotographerDetailsPage/> } />
           </Routes>
         </div>
       </div>

@@ -16,7 +16,7 @@ const bookingSchema = new mongoose.Schema({
     required: true,
   },
   duration: {
-    type: Number, // in hours
+    type: Number,
     required: true,
   },
   location: {
@@ -41,10 +41,10 @@ const bookingSchema = new mongoose.Schema({
     required: true,
   },
   specialRequests: String,
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 bookingSchema.index({ location: '2dsphere' });

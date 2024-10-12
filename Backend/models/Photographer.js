@@ -10,9 +10,7 @@ const photographerSchema = new mongoose.Schema({
     type: [String],
     required: true,
   },
-  portfolio: {
-    type: [String], // Array of image URLs
-  },
+  portfolio: [String],
   location: {
     type: {
       type: String,
@@ -24,9 +22,7 @@ const photographerSchema = new mongoose.Schema({
       required: true,
     }
   },
-  availability: {
-    type: [Date],
-  },
+  availability: [Date],
   pricing: {
     hourlyRate: {
       type: Number,
@@ -46,45 +42,39 @@ const photographerSchema = new mongoose.Schema({
     default: 0,
     min: [0, 'Rating must be above 0'],
     max: [5, 'Rating must be below 5'],
-    set: val => Math.round(val * 10) / 10 // Rounds to 1 decimal place
+    set: val => Math.round(val * 10) / 10
   },
   ratingQuantity: {
     type: Number,
     default: 0
   },
-  experience: {
-    type: String,
-  },
-  about: {
-    type: String,
-  },
-  portfolioDescription: {
-    type: String,
-  },
-  booking: {
-    type: String,
-  },
+  experience: String,
+  about: String,
+  portfolioDescription: String,
   equipment: {
     camera: String,
     lenses: String,
   },
-  languages: {
-    type: [String],
-  },
-  skills: {
-    type: [String],
-  },
+  languages: [String],
+  skills: [String],
   isAvailable: {
     type: Boolean,
     default: true,
   },
-  profilePicture: {
-    type: String,
-    default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
-  },
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 photographerSchema.index({ location: '2dsphere' });
+
+photographerSchema.virtual('userDetails', {
+  ref: 'User',
+  localField: 'user',
+  foreignField: '_id',
+  justOne: true
+});
 
 const Photographer = mongoose.model('Photographer', photographerSchema);
 

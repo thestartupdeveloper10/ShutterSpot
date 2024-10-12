@@ -1,61 +1,64 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const User = require("../models/user");
-const {
-  verifyToken,
-  verifyTokenAndAuthorization,
-  verifyTokenAndAdmin,
-} = require("./verifyToken");
+const express = require("express");
+const createError = require('http-errors');
+const { verifyToken, authorizeRoles, verifyOwnership } = require("./verifyToken");
 
-const usersRouter = require("express").Router();
+const usersRouter = express.Router();
 
-//UPDATE
-
-usersRouter.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
-  if (req.body.password) {
-    const saltRounds = 10
-     await bcrypt.hash(req.body.password, saltRounds)
-  }
-
+// UPDATE
+usersRouter.put("/:id", verifyToken, verifyOwnership, async (req, res, next) => {
   try {
+    if (req.body.password) {
+      const saltRounds = 10;
+      req.body.password = await bcrypt.hash(req.body.password, saltRounds);
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      {
-        $set: req.body,
-      },
+      { $set: req.body },
       { new: true }
     );
+
+    if (!updatedUser) {
+      return next(createError(404, 'User not found'));
+    }
+
     res.status(200).json(updatedUser);
   } catch (err) {
-    res.status(500).json(err);
+    next(createError(500, 'Error updating user'));
   }
 });
 
-//DELETE
-
-usersRouter.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
+// DELETE
+usersRouter.delete("/:id", verifyToken, verifyOwnership, async (req, res, next) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
-    res.status(200).json("User has been deleted...");
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    if (!deletedUser) {
+      return next(createError(404, 'User not found'));
+    }
+    res.status(200).json("User has been deleted");
   } catch (err) {
-    res.status(500).json(err);
+    next(createError(500, 'Error deleting user'));
   }
 });
 
-//GET USER
-
-usersRouter.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
+// GET USER
+usersRouter.get("/find/:id", verifyToken, authorizeRoles('admin'), async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
+    if (!user) {
+      return next(createError(404, 'User not found'));
+    }
     const { password, ...others } = user._doc;
     res.status(200).json(others);
   } catch (err) {
-    res.status(500).json(err);
+    next(createError(500, 'Error retrieving user'));
   }
 });
 
-//GET ALL USER
-
-usersRouter.get("/", verifyTokenAndAdmin, async (req, res) => {
+// GET ALL USERS
+usersRouter.get("/", verifyToken, authorizeRoles('admin'), async (req, res, next) => {
   const query = req.query.new;
   try {
     const users = query
@@ -63,35 +66,11 @@ usersRouter.get("/", verifyTokenAndAdmin, async (req, res) => {
       : await User.find();
     res.status(200).json(users);
   } catch (err) {
-    res.status(500).json(err);
+    next(createError(500, 'Error retrieving users'));
   }
 });
 
-//GET USER STATS
+// GET USER STATS
 
-usersRouter.get("/stats", verifyTokenAndAdmin, async (req, res) => {
-  const date = new Date();
-  const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
-
-  try {
-    const data = await User.aggregate([
-      { $match: { createdAt: { $gte: lastYear } } },
-      {
-        $project: {
-          month: { $month: "$createdAt" },
-        },
-      },
-      {
-        $group: {
-          _id: "$month",
-          total: { $sum: 1 },
-        },
-      },
-    ]);
-    res.status(200).json(data)
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
 
 module.exports = usersRouter;

@@ -1,65 +1,74 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const createError = require('http-errors');
+
+const extractToken = (req) => {
+  if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+    return req.headers.authorization.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    return req.query.token;
+  }
+  return null;
+};
 
 const verifyToken = (req, res, next) => {
-  console.log("Headers received:", req.headers);
-  const authHeader = req.headers.authorization || req.headers.Authorization;
-  console.log("Auth header:", authHeader);
+  const token = extractToken(req);
+  
+  if (!token) {
+    return next(createError(401, 'No token provided'));
+  }
 
-  if (authHeader) {
-    const token = authHeader.split(" ")[1];
-    console.log("Token extracted:", token);
-
-    jwt.verify(token, process.env.JWT_SEC, (err, user) => {
-      if (err) {
-        console.error("Token verification failed:", err);
-        return res.status(403).json("Token is not valid!");
-      }
-      console.log("Token verified successfully. User:", user);
-      req.user = user;
-      next();
-    });
-  } else {
-    console.log("No auth header found");
-    return res.status(401).json("You are not authenticated!");
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SEC);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return next(createError(401, 'Token expired'));
+    }
+    return next(createError(403, 'Invalid token'));
   }
 };
 
-const verifyTokenAndAuthorization = (req, res, next) => {
-  verifyToken(req, res, () => {
-    if (!req.user) {
-      console.error("User not found in request after token verification");
-      return res.status(403).json("Token is not valid!");
-    }
+const verifyRefreshToken = (req, res, next) => {
+  const refreshToken = req.body.refreshToken;
+  
+  if (!refreshToken) {
+    return next(createError(401, 'No refresh token provided'));
+  }
 
-    console.log("User from token:", req.user);
-
-    if (req.user.id === req.params.id || req.user.isAdmin) {
-      next();
-    } else {
-      return res.status(403).json("You are not allowed to do that!");
-    }
-  });
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return next(createError(403, 'Invalid refresh token'));
+  }
 };
 
-const verifyTokenAndAdmin = (req, res, next) => {
-  verifyToken(req, res, () => {
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
     if (!req.user) {
-      console.error("User not found in request after token verification");
-      return res.status(403).json("Token is not valid!");
+      return next(createError(401, 'User not authenticated'));
     }
-
-    console.log("User from token:", req.user);
-
-    if (req.user.isAdmin) {
-      next();
-    } else {
-      return res.status(403).json("You are not allowed to do that!");
+    
+    if (!roles.includes(req.user.role)) {
+      return next(createError(403, 'User not authorized for this action'));
     }
-  });
+    
+    next();
+  };
+};
+
+const verifyOwnership = (req, res, next) => {
+  if (req.user.id !== req.params.id && req.user.role !== 'admin') {
+    return next(createError(403, 'You are not authorized to perform this action'));
+  }
+  next();
 };
 
 module.exports = {
   verifyToken,
-  verifyTokenAndAuthorization,
-  verifyTokenAndAdmin,
+  verifyRefreshToken,
+  authorizeRoles,
+  verifyOwnership
 };

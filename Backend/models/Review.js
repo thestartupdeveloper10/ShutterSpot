@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Photographer = require('./Photographer');
+const Photographer = require('./photographer');
 
 const reviewSchema = new mongoose.Schema({
   review: {
@@ -12,10 +12,6 @@ const reviewSchema = new mongoose.Schema({
     max: 5,
     required: [true, 'Please provide a rating']
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
   photographer: {
     type: mongoose.Schema.ObjectId,
     ref: 'Photographer',
@@ -27,14 +23,13 @@ const reviewSchema = new mongoose.Schema({
     required: [true, 'Review must belong to a client']
   }
 }, {
+  timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Prevent duplicate reviews
 reviewSchema.index({ photographer: 1, client: 1 }, { unique: true });
 
-// Static method to calculate average rating
 reviewSchema.statics.calcAverageRatings = async function(photographerId) {
   const stats = await this.aggregate([
     {
@@ -62,12 +57,10 @@ reviewSchema.statics.calcAverageRatings = async function(photographerId) {
   }
 };
 
-// Call calcAverageRatings after save
 reviewSchema.post('save', function() {
   this.constructor.calcAverageRatings(this.photographer);
 });
 
-// Call calcAverageRatings before remove
 reviewSchema.pre(/^findOneAnd/, async function(next) {
   this.r = await this.findOne();
   next();

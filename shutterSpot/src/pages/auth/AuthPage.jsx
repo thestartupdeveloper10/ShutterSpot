@@ -1,67 +1,124 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Facebook, Mail, X } from "lucide-react";
+import { Facebook, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
+import { login, register } from '../../redux/features/user/userSlice';
 
 const AuthPage = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoading, error } = useSelector(state => state.user);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [role, setRole] = useState('client');
 
-  const handleEmailAuth = (e, isSignIn) => {
+  const handleEmailAuth = async (e, isSignIn) => {
     e.preventDefault();
-    console.log(isSignIn ? 'Sign In' : 'Register', { email, password, name });
+    const authAction = isSignIn ? login : register;
+    const credentials = isSignIn ? { email, password } : { username, email, password, role };
+
+    try {
+      const resultAction = await dispatch(authAction(credentials));
+      if (authAction.fulfilled.match(resultAction)) {
+        const user = resultAction.payload;
+        toast({
+          title: isSignIn ? "Signed in successfully" : "Registered successfully",
+          description: `Welcome ${user.username}!`,
+        });
+
+        if (isSignIn) {
+          navigate(user.role === 'photographer' ? '/photographer-dashboard' : '/home');
+        } else {
+          if (user.role === 'photographer') {
+            navigate('/photographer-details');
+          } else {
+            navigate('/home');
+          }
+        }
+      } else if (authAction.rejected.match(resultAction)) {
+        throw new Error(resultAction.error.message);
+      }
+    } catch (err) {
+      toast({
+        title: "Authentication failed",
+        description: err.message || "An error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleSocialAuth = (provider) => {
+  const handleSocialAuth = async (provider) => {
     console.log(`Authenticate with ${provider}`);
+    toast({
+      title: "Social Authentication",
+      description: `${provider} authentication is not implemented yet.`,
+      variant: "default",
+    });
   };
 
   const AuthForm = ({ isSignIn }) => (
     <form onSubmit={(e) => handleEmailAuth(e, isSignIn)} className="space-y-4">
       {!isSignIn && (
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input 
-            type="text" 
-            id="name" 
-            placeholder="Enter your name" 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
-            required 
-            className="bg-gray-100"
-          />
-        </div>
+        <>
+          <div className="space-y-2">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+            <input 
+              type="text" 
+              id="username" 
+              placeholder="Enter your username" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              required 
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
+            <Select onValueChange={setRole} defaultValue={role}>
+              <SelectTrigger className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                <SelectValue placeholder="Select your role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="client">Client</SelectItem>
+                <SelectItem value="photographer">Photographer</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </>
       )}
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input 
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+        <input 
           type="email" 
           id="email" 
           placeholder="Enter your email" 
           value={email} 
           onChange={(e) => setEmail(e.target.value)} 
           required 
-          className="bg-gray-100"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input 
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+        <input 
           type="password" 
           id="password" 
           placeholder="Enter your password" 
           value={password} 
           onChange={(e) => setPassword(e.target.value)} 
           required 
-          className="bg-gray-100"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
-      <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-        {isSignIn ? 'Sign In' : 'Register'}
+      <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" disabled={isLoading}>
+        {isLoading ? "Processing..." : (isSignIn ? 'Sign In' : 'Register')}
       </Button>
     </form>
   );

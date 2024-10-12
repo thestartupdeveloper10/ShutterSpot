@@ -6,18 +6,14 @@ const clientSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  preferences: {
-    type: [String], // e.g., ['portrait', 'wedding', 'event']
-  },
+  preferences: [String],
   location: {
     type: {
       type: String,
       enum: ['Point'],
       default: 'Point',
     },
-    coordinates: {
-      type: [Number],
-    }
+    coordinates: [Number],
   },
   bookings: [{
     type: mongoose.Schema.ObjectId,
@@ -27,9 +23,20 @@ const clientSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'Photographer',
   }],
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 clientSchema.index({ location: '2dsphere' });
+
+clientSchema.virtual('userDetails', {
+  ref: 'User',
+  localField: 'user',
+  foreignField: '_id',
+  justOne: true
+});
 
 const Client = mongoose.model('Client', clientSchema);
 
