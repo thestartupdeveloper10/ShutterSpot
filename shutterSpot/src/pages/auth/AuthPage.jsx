@@ -124,7 +124,7 @@ const AuthPage = () => {
   );
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300">
+    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300">
       <div className="w-full max-w-md px-4 py-8 sm:px-0">
         <Card className="backdrop-blur-sm bg-white/70 shadow-xl">
           <CardHeader className="space-y-1">

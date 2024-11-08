@@ -2,9 +2,9 @@ import { Camera, Users, MapPin, Star } from 'lucide-react';
 
 const InfoCard = ({ icon, value, label }) => {
   return (
-    <div className="py-8 rounded-md shadow-lg mx-10 md:mx-0 px-8 bg-white items-center justify-center flex flex-col">
+    <div className="py-2 md:py-8 rounded-md shadow-lg mx-10 md:mx-0 px-8 bg-white items-center justify-center flex flex-col">
       {icon}
-      <h2 className="font-extrabold text-3xl mt-4">{value}</h2>
+      <h2 className="font-extrabold md:text-3xl md:mt-4">{value}</h2>
       <p className="text-gray-600 text-center">{label}</p>
     </div>
   );
@@ -19,7 +19,7 @@ const InfoCardGrid = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 z-20 -mt-[50px] relative md:mx-20">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 z-20 -mt-[40px] md:-mt-[50px] relative md:mx-20">
       {cards.map((card, index) => (
         <InfoCard key={index} {...card} />
       ))}

@@ -21,7 +21,7 @@ const Services = () => {
             <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={studio} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
                 <h2 className='text-[20px] lg:text-[30px] font-bold '>Studio Shoot</h2>
-                <p className='md:hidden lg:block text-[#fcf9f7]'>
+                <p className='md:hidden lg:block text-[#fcf9f7]  '>
                 Indulge in the refined elegance and sophistication of our professional studio shoots, where every image is crafted with meticulous precision.
                 </p>
             </div>
@@ -29,8 +29,8 @@ const Services = () => {
             <div className='relative'>
             <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={workout} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
-                <h1 className='text-[20px] lg:text-[30px] font-bold  '>Fit & Fabulous</h1>
-                <p className='md:hidden lg:block text-[#fcf9f7]'>
+                <h1 className='text-[20px] lg:text-[30px]  font-bold  '>Fit & Fabulous</h1>
+                <p className='md:hidden lg:block text-[#fcf9f7]  '>
                 Ignite your passion for fitness and wellness with our inspiring collection of workout motivation, designed to empower and energize.
                 </p>
             </div>
@@ -44,7 +44,7 @@ const Services = () => {
             <img className="h-full w-full md:max-w-full rounded-lg bg-cover bg-center" src={female} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
                 <h1 className='text-[20px] lg:text-[30px] font-bold  '>Urban shoots</h1>
-                <p className='md:hidden lg:block text-[#fcf9f7]'>
+                <p className='md:hidden lg:block text-[#fcf9f7]  '>
                 Experience the vibrant tapestry of city life through the candid lens of street photography, capturing the essence of urban culture and diversity.
                 </p>
             </div>
@@ -53,7 +53,7 @@ const Services = () => {
             <img className="h-full max-w-full rounded-lg bg-cover bg-center" src={strawbberry} alt=""/>
             <div className="details absolute md:bottom-3 bottom-2 w-[360px] md:w-auto lg:w-[380px] md:left-3 p-2 left-2 text-white ">
                 <h1 className='text-[20px] lg:text-[30px] font-bold  '>Food Gallery</h1>
-                <p className='md:hidden lg:block text-[#fcf9f7]'>
+                <p className='md:hidden lg:block text-[#fcf9f7]  '>
                 Savor the artistry and flavors of culinary delights showcased in our gourmet gallery of mouthwatering food photography.
                 </p>
             </div>
