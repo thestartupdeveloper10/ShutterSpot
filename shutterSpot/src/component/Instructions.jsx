@@ -54,12 +54,12 @@ const Instructions = () => {
   ];
 
   return ( 
-    <div className='mt-28 bg-[#f9f6ee] px-10 py-10'>
+    <div className='mt-28 bg-[#f9f6ee] px-4 py-10'>
       <div className='flex flex-col items-center justify-center mb-16'>
         <h1 className='text-center'>How ShutterSpot works</h1>
         <p className='text-center'>We have simplified the process of getting great photography. Booking a photographer through ShutterSpot is simple as 1, 2, 3.</p>
       </div>
-      <div className="overal grid md:grid-cols-2 lg:grid-cols-4 grid-cols-1 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 grid-cols-1 gap-4">
         {instructionSteps.map((step, index) => (
           <InstructionCard key={index} {...step} />
         ))}

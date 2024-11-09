@@ -60,7 +60,7 @@ const Formbook = () => {
         </h3>
         <div>
         <Select>
-      <SelectTrigger className="lg:w-[350px] w-[290px] h-20 text-[15px]">
+      <SelectTrigger className="lg:w-[350px] w-[290px] h-14 text-[15px]">
         <SelectValue placeholder="Select a timezone" />
       </SelectTrigger>
       <SelectContent>
@@ -125,7 +125,7 @@ const Formbook = () => {
         <Button
           variant={"outline"}
           className={cn(
-            "lg:w-[350px] w-[290px] h-20 justify-start text-left font-normal",
+            "lg:w-[350px] w-[290px] h-14 justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
@@ -161,7 +161,7 @@ const Formbook = () => {
           name="username"
           render={({ field }) => (
             <FormItem>
-                  <FormControl className='h-20 text-[15px]'>
+                  <FormControl className='h-14 text-[15px]'>
                       <Input placeholder="Location" {...field} />
                   </FormControl>
                   <FormMessage />
@@ -169,7 +169,7 @@ const Formbook = () => {
              )}
             />
         </div>
-       <div className="bg-blue-500 lg:w-[350px] w-[290px] h-20 flex justify-center items-center text-[15px]">
+       <div className="flex justify-center items-center">
        <Button type="submit">Find Your Photographer</Button>
        </div>
       </form>
