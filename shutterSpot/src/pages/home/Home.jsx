@@ -22,7 +22,7 @@ const Home = () => {
         <div className="mt-20 md:mt-12">
                 <NavBar/>
         <div>    
-        <div className=" h-[70dvh] md:h-[70dvh] lg:h-screen items-center flex justify-center rounded-md my-2 relative ">
+        <div className="h-[70dvh] md:h-[70dvh] lg:h-screen items-center flex justify-center rounded-md my-2 relative ">
             <img src='https://cdn.pixabay.com/photo/2022/05/22/16/34/woman-7213852_960_720.jpg' className='bg-cover h-full w-full object-cover bg-right' alt="" />
             <div className="absolute md:left-10  lg:left-[155px] left-10 overal flex gap-10 md:gap-3 md:w-[500px] w-[300px]  rounded-md items-start justify-center flex-col text-white">
                 <div className="text flex flex-col md:gap-2 gap-6 items-center">

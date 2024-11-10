@@ -83,6 +83,11 @@ const Services = () => {
       description: "Savor the artistry and flavors of culinary delights showcased in our gourmet gallery of mouthwatering food photography."
     },
     {
+      image: strawbberry,
+      title: "Food Gallery",
+      description: "Savor the artistry and flavors of culinary delights showcased in our gourmet gallery of mouthwatering food photography."
+    },
+    {
       image: wedding,
       title: "Love in Focus",
       description: "Immerse yourself in the timeless romance and heartfelt moments of weddings, beautifully preserved in each captivating photograph.",

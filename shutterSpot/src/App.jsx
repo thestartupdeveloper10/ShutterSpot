@@ -6,6 +6,8 @@ import AuthPage from './pages/auth/AuthPage';
 import PhotographersListingPage from './pages/all_photographers/PhotographersListingPage';
 import PhotographerDashboard from './pages/photographer_dashboard/PhotographerDashboard';
 import PhotographerDetailsPage from './pages/photographer_dashboard/PhotographerDetailsPage';
+import UserProfile from './pages/userProfile/UserProfile';
+import CustomerProfile from './pages/client/CustomerProfile';
 
 
 
@@ -26,6 +28,8 @@ function App() {
             <Route path='/auth' element={<AuthPage/> } />
             <Route path='/photographer-dashboard' element={<PhotographerDashboard/> } />
             <Route path='/photographerDetails' element={<PhotographerDetailsPage/> } />
+            <Route path='/userProfile' element={<UserProfile/> } />
+            <Route path='/customerProfile' element={<CustomerProfile/> } />
           </Routes>
         </div>
       </div>
