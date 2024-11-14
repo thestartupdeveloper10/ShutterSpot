@@ -69,7 +69,7 @@ const ChooseBook = () => {
   return (
     <div className="bg-[#f9f6ee] px-10 py-16 mt-8">
       <div className="flex flex-col items-center justify-center mb-16">
-        <h1 className="text-4xl font-bold mb-4">WHY CHOOSE US?</h1>
+        <h1 className="text-4xl font-bold mb-4 text-center">WHY CHOOSE US?</h1>
         <p className="text-center text-gray-600 max-w-2xl">
           We have simplified the process of getting great photography. Booking a photographer through ShutterSpot is simple as 1, 2, 3.
         </p>

@@ -14,6 +14,7 @@ const ServiceCard = ({ image, title, description, isLarge = false }) => (
     className={`relative group overflow-hidden rounded-2xl ${isLarge ? 'h-[600px]' : 'h-[400px]'}`}
     whileHover={{ scale: 1.02 }}
     transition={{ duration: 0.3 }}
+    viewport={{ once: true }}
   >
     {/* Background Image */}
     <div className="absolute inset-0 w-full h-full">
@@ -33,6 +34,7 @@ const ServiceCard = ({ image, title, description, isLarge = false }) => (
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="mb-2"
         >
@@ -96,13 +98,14 @@ const Services = () => {
   ];
 
   return (
-    <section className="py-10 px-4 bg-gray-50">
+    <section className=" bg-gray-50">
       {/* Header Section */}
-      <div className="max-w-7xl mx-auto mb-12">
+      <div className=" mb-12">
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
+           viewport={{ once: true }}
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -120,6 +123,7 @@ const Services = () => {
               key={index}
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className={service.isLarge ? 'lg:col-span-2' : ''}
             >
@@ -132,6 +136,7 @@ const Services = () => {
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="mt-16 text-center"
         >

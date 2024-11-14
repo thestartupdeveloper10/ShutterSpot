@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';
-import Photographer_Details from './pages/photographer_details/Phographer-Details';
-import Book from './pages/booking/book';
+import Photographer_Details from './pages/customer/photographer_details/Phographer-Details';
+import Book from './pages/customer/booking/book';
 import AuthPage from './pages/auth/AuthPage';
-import PhotographersListingPage from './pages/all_photographers/PhotographersListingPage';
-import PhotographerDashboard from './pages/photographer_dashboard/PhotographerDashboard';
-import PhotographerDetailsPage from './pages/photographer_dashboard/PhotographerDetailsPage';
-import UserProfile from './pages/userProfile/UserProfile';
-import CustomerProfile from './pages/client/CustomerProfile';
+import PhotographersListingPage from './pages/customer/all_photographers/PhotographersListingPage';
+import PhotographerDashboard from './pages/photographer/photographer_dashboard/PhotographerDashboard';
+import PhotographerDetailsPage from './pages/photographer/addDetails/PhotographerDetailsPage';
+import UserProfile from './pages/photographer/userProfile/UserProfile';
+import CustomerProfile from './pages/customer/customerProfile/CustomerProfile';
 
 
 
@@ -28,8 +28,8 @@ function App() {
             <Route path='/auth' element={<AuthPage/> } />
             <Route path='/photographer-dashboard' element={<PhotographerDashboard/> } />
             <Route path='/photographerDetails' element={<PhotographerDetailsPage/> } />
-            <Route path='/userProfile' element={<UserProfile/> } />
-            <Route path='/customerProfile' element={<CustomerProfile/> } />
+            <Route path='/photographerProfile' element={<UserProfile/> } />
+            <Route path='/clientProfile' element={<CustomerProfile/> } />
           </Routes>
         </div>
       </div>

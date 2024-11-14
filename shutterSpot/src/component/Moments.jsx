@@ -10,40 +10,14 @@ import {
   Award
 } from 'lucide-react';
 
-import dog from '../assets/imgs/others/dog.jpg';
-import kid from '../assets/imgs/kids/kid.jpg';
 import couple from '../assets/imgs/couples/couple-wedding.jpg';
 import man from '../assets/imgs/Mmodels/man-potraite.jpg';
-import bike from '../assets/imgs/others/bike.jpg';
 import family from '../assets/imgs/couples/family.jpg';
 
-const StatsCard = ({ icon: Icon, value, label }) => (
-  <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-    <Icon size={32} className="text-purple-600 mb-3" />
-    <span className="text-3xl font-bold text-gray-800 mb-1">{value}</span>
-    <span className="text-sm text-gray-600 text-center">{label}</span>
-  </div>
-);
 
-const ProcessStep = ({ number, title, description }) => (
-  <div className="relative flex items-center group">
-    <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full group-hover:bg-purple-200 transition-colors">
-      <span className="text-2xl font-bold text-purple-600">{number}</span>
-    </div>
-    <div className="ml-4 flex-1">
-      <h3 className="text-lg font-semibold text-gray-800 mb-1">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </div>
-  </div>
-);
+
 
 const Capture = () => {
-  const stats = [
-    { icon: Users, value: "10K+", label: "Happy Clients" },
-    { icon: Camera, value: "500+", label: "Pro Photographers" },
-    { icon: ImageIcon, value: "1M+", label: "Photos Delivered" },
-    { icon: Star, value: "4.9", label: "Average Rating" }
-  ];
 
   const testimonials = [
     {
@@ -68,7 +42,7 @@ const Capture = () => {
 
   return (
     <div className="bg-gray-50 py-20">
-      <div className="container mx-auto px-4">
+      <div className="">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -79,34 +53,7 @@ const Capture = () => {
           </p>
         </div>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-20">
-          {stats.map((stat, index) => (
-            <StatsCard key={index} {...stat} />
-          ))}
-        </div>
-
-        {/* Process Section */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <ProcessStep 
-              number="1"
-              title="Browse & Choose"
-              description="Explore portfolios of talented photographers in your area and find your perfect match."
-            />
-            <ProcessStep 
-              number="2"
-              title="Book & Plan"
-              description="Schedule your session and communicate directly with your photographer to plan the details."
-            />
-            <ProcessStep 
-              number="3"
-              title="Capture & Share"
-              description="Get your professional photos delivered through our secure platform, ready to share."
-            />
-          </div>
-        </div>
+      
 
         {/* Testimonials Section */}
         <div className="mb-20">

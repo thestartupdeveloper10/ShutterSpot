@@ -9,38 +9,45 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Camera, DollarSign, Star, Users } from 'lucide-react';
 
+const mockPhotographer = {
+  username: "JaneDoe",
+  email: "jane.doe@example.com",
+  profilePicture: "https://via.placeholder.com/150",
+  ratingAverage: 4.5,
+  specialties: ["Weddings", "Portraits", "Events"],
+  about: "Experienced photographer with a passion for capturing special moments.",
+  equipment: {
+    camera: "Canon EOS R5",
+    lenses: "24-70mm, 50mm, 85mm",
+  },
+  portfolio: [
+    "https://via.placeholder.com/300",
+    "https://via.placeholder.com/300",
+    "https://via.placeholder.com/300",
+    "https://via.placeholder.com/300",
+  ],
+};
+
+const mockBookings = [
+  { id: 1, clientName: "John Smith", date: "2024-11-12T10:00:00" },
+  { id: 2, clientName: "Alice Johnson", date: "2024-11-13T14:00:00" },
+  { id: 3, clientName: "Bob Williams", date: "2024-11-14T09:00:00" },
+  { id: 4, clientName: "Samantha Brown", date: "2024-11-15T11:30:00" },
+];
+
+const mockEarnings = [
+  { date: "2024-11-01", amount: 150 },
+  { date: "2024-11-05", amount: 200 },
+  { date: "2024-11-10", amount: 350 },
+  { date: "2024-11-15", amount: 400 },
+];
+
 const PhotographerDashboard = () => {
   const navigate = useNavigate();
-  const [photographer, setPhotographer] = useState(null);
-  const [bookings, setBookings] = useState([]);
-  const [earnings, setEarnings] = useState([]);
+  const [photographer, setPhotographer] = useState(mockPhotographer);
+  const [bookings, setBookings] = useState(mockBookings);
+  const [earnings, setEarnings] = useState(mockEarnings);
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  useEffect(() => {
-    const fetchPhotographerData = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('/api/photographer/dashboard', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setPhotographer(data.photographer);
-          setBookings(data.bookings);
-          setEarnings(data.earnings);
-        } else {
-          // Handle error - maybe redirect to login if unauthorized
-          navigate('/auth');
-        }
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      }
-    };
-
-    fetchPhotographerData();
-  }, [navigate]);
 
   if (!photographer) {
     return <div>Loading...</div>;

@@ -1,23 +1,27 @@
 const bcrypt = require('bcrypt');
-const User = require("../models/user");
 const express = require("express");
 const createError = require('http-errors');
-const { verifyToken, authorizeRoles, verifyOwnership } = require("./verifyToken");
+const { verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin,} = require("./verifyToken");
+const { PrismaClient, Prisma } = require('@prisma/client')
+
+const prisma = new PrismaClient()
 
 const usersRouter = express.Router();
 
 // UPDATE
-usersRouter.put("/:id", verifyToken, verifyOwnership, async (req, res, next) => {
+usersRouter.put("/:id", verifyToken, verifyTokenAndAuthorization, async (req, res, next) => {
   try {
     if (req.body.password) {
       const saltRounds = 10;
       req.body.password = await bcrypt.hash(req.body.password, saltRounds);
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true }
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: req.params.id,
+      },
+      data: req.body,
+    }
     );
 
     if (!updatedUser) {
@@ -31,9 +35,9 @@ usersRouter.put("/:id", verifyToken, verifyOwnership, async (req, res, next) => 
 });
 
 // DELETE
-usersRouter.delete("/:id", verifyToken, verifyOwnership, async (req, res, next) => {
+usersRouter.delete("/:id", verifyToken, verifyTokenAndAuthorization, async (req, res, next) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    const deletedUser = await prisma.user.delete({where:{id: req.params.id}});
     if (!deletedUser) {
       return next(createError(404, 'User not found'));
     }
@@ -44,13 +48,17 @@ usersRouter.delete("/:id", verifyToken, verifyOwnership, async (req, res, next) 
 });
 
 // GET USER
-usersRouter.get("/find/:id", verifyToken, authorizeRoles('admin'), async (req, res, next) => {
+usersRouter.get("/find/:id", verifyToken, verifyTokenAndAdmin, async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.params.id,
+      },
+    })
     if (!user) {
       return next(createError(404, 'User not found'));
     }
-    const { password, ...others } = user._doc;
+    const { password, ...others } = user;
     res.status(200).json(others);
   } catch (err) {
     next(createError(500, 'Error retrieving user'));
@@ -58,12 +66,14 @@ usersRouter.get("/find/:id", verifyToken, authorizeRoles('admin'), async (req, r
 });
 
 // GET ALL USERS
-usersRouter.get("/", verifyToken, authorizeRoles('admin'), async (req, res, next) => {
+usersRouter.get("/", verifyToken, verifyTokenAndAdmin, async (req, res, next) => {
   const query = req.query.new;
   try {
     const users = query
-      ? await User.find().sort({ _id: -1 }).limit(5)
-      : await User.find();
+      ? await prisma.user.findMany()
+      : await prisma.user.findMany({ orderBy:{
+        createdAt: 'desc'
+      }})
     res.status(200).json(users);
   } catch (err) {
     next(createError(500, 'Error retrieving users'));

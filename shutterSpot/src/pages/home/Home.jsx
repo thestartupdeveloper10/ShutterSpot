@@ -42,16 +42,7 @@ const Home = () => {
         <InfoCardGrid/>
         {/* page2 */}
         <div className=" md:mx-24 mx-5 mt-20">
-            <div className="intro flex flex-col gap-5">
-                <p>Best Location</p>
-                <div>
-                    <div className=" flex-col md:flex md:flex-row md:gap-10 gap-5 justify-between items-start">
-                        <h2 className=" font-bold ">ShutterSpot: Your Instant Photography Connection</h2>
-                        <p className="flex-grow  md:pt-1">Discover and book talented photographers nearby in real-time. Whether it is outdoor landscapes, picnics, weddings, or more, SnapSync matches you with the perfect photographer at the touch of a button. Embrace spontaneity and bring your vision to life effortlessly.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            
 
 {/* section 2 */}
 <Services />

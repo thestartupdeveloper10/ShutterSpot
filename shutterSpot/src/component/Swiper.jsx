@@ -83,7 +83,7 @@ const PhotographerCard = ({ photographer }) => (
               </div>
             </div>
             <div className="mt-4">
-              <Link to={`/photographer/${photographer.id}`}>
+              <Link to='/photographer'>
                 <button className="w-full bg-blue-600 py-4 text-white">View Details</button>
               </Link>
             </div>
@@ -96,8 +96,8 @@ const PhotographerCard = ({ photographer }) => (
 
 export function PhotographerCarousel() {
   return (
-    <div className="w-full mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8">Top Photographers</h1>
+    <div className="w-full h-screen flex flex-col justify-center  items-center py-8">
+      <h1 className=" text-4xl md:text-5xl font-bold text-center mb-8">Top Photographers</h1>
       <Carousel
         opts={{
           align: "start",

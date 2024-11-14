@@ -1,5 +1,5 @@
 import ShuffleHero from './ShuffleHeroImgs';
-import Footer from '../../component/Footer';
+import Footer from '../../../component/Footer';
 import NavBar from '@/component/NavBar';
 const Book = () => {
     return ( 

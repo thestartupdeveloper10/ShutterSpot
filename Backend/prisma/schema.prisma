@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(uuid())
+  username      String
+  email         String        @unique
+  password      String
+  role          Role         @default(client)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  // Relations
+  clientProfile ClientProfile?
+  photographer  Photographer?
+  reviews       Review[]      // Users (both clients and photographers) can write reviews
+}
+
+enum Role {
+  client
+  photographer
+  admin
+}
+
+model ClientProfile {
+  id                   String         @id @default(uuid())
+  userId               String         @unique
+  phone                Int
+  location             String
+  profilePic           String         @default("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png")
+  skills               String[]
+  
+  // Relations
+  user                 User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings             Booking[]      // Only clients can make bookings
+  favoritePhotographer Photographer[] @relation("ClientFavorites")
+}
+
+model Photographer {
+  id              String        @id @default(uuid())
+  userId          String        @unique
+  name            String
+  about           String
+  portfolio       String
+  skills          String[]
+  status          Availability  @default(available)
+  cameras         String[]
+  lenses          String[]
+  experience      String
+  education       String
+  languages       String[]
+  availability    String[]
+  experienceYears Int
+  location        String
+  services        String[]
+  priceRange      String
+  photos          String[]
+  profilePic      String        @default("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png")
+  
+  // Relations
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews         Review[]
+  receivedBookings Booking[]    @relation("PhotographerBookings") // Bookings received by photographer
+  favoredByClients ClientProfile[] @relation("ClientFavorites")
+}
+
+enum Availability {
+  available
+  unavailable
+}
+
+model Review {
+  id             String       @id @default(uuid())
+  photographerId String
+  userId         String
+  rating         Int
+  comment        String
+  createdAt      DateTime     @default(now())
+  
+  // Relations
+  photographer   Photographer @relation(fields: [photographerId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Booking {
+  id             String       @id @default(uuid())
+  photographerId String
+  clientId       String      // Renamed from userId to be more explicit
+  startDate      DateTime
+  endDate        DateTime
+  location       String
+  duration       Int
+  status         Status      @default(pending)
+  totalPrice     Float
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  
+  // Relations
+  photographer   Photographer @relation("PhotographerBookings", fields: [photographerId], references: [id], onDelete: Cascade)
+  client        ClientProfile @relation(fields: [clientId], references: [userId], onDelete: Cascade) // Changed to reference ClientProfile directly
+}
+
+enum Status {
+  pending
+  confirmed
+  rejected
+  cancelled
+}

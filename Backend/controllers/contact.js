@@ -1,7 +1,7 @@
 const Contact = require("../models/contact");
 const express = require("express");
 const createError = require('http-errors');
-const { verifyToken, authorizeRoles } = require("./verifyToken");
+const { verifyToken, verifyTokenAndAdmin } = require("./verifyToken");
 
 const contactRouter = express.Router();
 
@@ -17,7 +17,7 @@ contactRouter.post('/', async (req, res, next) => {
 });
 
 // Get all contacts (admin only)
-contactRouter.get("/", verifyToken, authorizeRoles('admin'), async (req, res, next) => {
+contactRouter.get("/", verifyToken, verifyTokenAndAdmin, async (req, res, next) => {
   const query = req.query.new;
   try {
     const contacts = query

@@ -10,6 +10,7 @@ const authRouter = require('./controllers/auth');
 const usersRouter = require('./controllers/users');
 const contactRouter = require('./controllers/contact');
 const mpesaRouter = require('./controllers/mpesa');
+const photographerRouter = require('./controllers/photographer');
 
 mongoose.set('strictQuery', false);
 
@@ -32,6 +33,7 @@ app.use(express.static('dist'));
 app.use('/api/contact', contactRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/photographers', photographerRouter);
 app.use('/api/checkout', mpesaRouter);
 
 app.use(middleware.unknownEndpoint);

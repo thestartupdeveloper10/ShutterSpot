@@ -1,74 +1,65 @@
-const jwt = require('jsonwebtoken');
-const createError = require('http-errors');
-
-const extractToken = (req) => {
-  if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-    return req.headers.authorization.split(' ')[1];
-  } else if (req.query && req.query.token) {
-    return req.query.token;
-  }
-  return null;
-};
+const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
-  const token = extractToken(req);
-  
-  if (!token) {
-    return next(createError(401, 'No token provided'));
-  }
+  console.log("Headers received:", req.headers);
+  const authHeader = req.headers.token || req.headers.Authorization;
+  console.log("Auth header:", authHeader);
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SEC);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      return next(createError(401, 'Token expired'));
-    }
-    return next(createError(403, 'Invalid token'));
-  }
-};
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    console.log("Token extracted:", token);
 
-const verifyRefreshToken = (req, res, next) => {
-  const refreshToken = req.body.refreshToken;
-  
-  if (!refreshToken) {
-    return next(createError(401, 'No refresh token provided'));
-  }
-
-  try {
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return next(createError(403, 'Invalid refresh token'));
+    jwt.verify(token, process.env.JWT_SEC, (err, user) => {
+      if (err) {
+        console.error("Token verification failed:", err);
+        return res.status(403).json("Token is not valid!");
+      }
+      console.log("Token verified successfully. User:", user);
+      req.user = user;
+      next();
+    });
+  } else {
+    console.log("No auth header found");
+    return res.status(401).json("You are not authenticated!");
   }
 };
 
-const authorizeRoles = (...roles) => {
-  return (req, res, next) => {
+const verifyTokenAndAuthorization = (req, res, next) => {
+  verifyToken(req, res, () => {
     if (!req.user) {
-      return next(createError(401, 'User not authenticated'));
+      console.error("User not found in request after token verification");
+      return res.status(403).json("Token is not valid!");
     }
-    
-    if (!roles.includes(req.user.role)) {
-      return next(createError(403, 'User not authorized for this action'));
+
+    console.log("User from token:", req.user);
+
+    if (req.user.id === req.params.id || req.user.role === "admin") {
+      next();
+    } else {
+      return res.status(403).json("You are not allowed to do that!");
     }
-    
-    next();
-  };
+  });
 };
 
-const verifyOwnership = (req, res, next) => {
-  if (req.user.id !== req.params.id && req.user.role !== 'admin') {
-    return next(createError(403, 'You are not authorized to perform this action'));
-  }
-  next();
+const verifyTokenAndAdmin = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (!req.user) {
+      console.error("User not found in request after token verification");
+      return res.status(403).json("Token is not valid!");
+    }
+
+    console.log("User from token:", req.user);
+
+    if (req.user.role === "admin") {
+      next();
+    } else {
+      return res.status(403).json("You are not allowed to do that!");
+    }
+  });
 };
 
 module.exports = {
   verifyToken,
-  verifyRefreshToken,
-  authorizeRoles,
-  verifyOwnership
+  verifyTokenAndAuthorization,
+  verifyTokenAndAdmin,
 };
