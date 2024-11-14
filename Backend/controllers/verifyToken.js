@@ -33,7 +33,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
 
     console.log("User from token:", req.user);
 
-    if (req.user.id === req.params.id || req.user.role === "admin") {
+    if (req.user.id == req.params.id || req.user.role === "admin") {
       next();
     } else {
       return res.status(403).json("You are not allowed to do that!");

@@ -74,7 +74,7 @@ photographerRouter.post("/", verifyToken, async (req, res, next) => {
   });
 
 // UPDATE
-photographerRouter.put("/:id", verifyToken, verifyTokenAndAuthorization, async (req, res, next) => {
+photographerRouter.put("/:id", verifyToken, async (req, res, next) => {
   try {
     if (req.body.password) {
       const saltRounds = 10;
@@ -90,25 +90,25 @@ photographerRouter.put("/:id", verifyToken, verifyTokenAndAuthorization, async (
     );
 
     if (!updatedPhotographer) {
-      return next(createError(404, 'User not found'));
+      return next(createError(404, 'photographer not found'));
     }
 
     res.status(200).json(updatedPhotographer);
   } catch (err) {
-    next(createError(500, 'Error updating user'));
+    next(createError(500, 'Error updating photographer'));
   }
 });
 
 // DELETE
-photographerRouter.delete("/:id", verifyToken, verifyTokenAndAuthorization, async (req, res, next) => {
+photographerRouter.delete("/:id", verifyToken, async (req, res, next) => {
   try {
     const deletedPhotographer = await prisma.photographer.delete({where:{id: req.params.id}});
     if (!deletedPhotographer) {
-      return next(createError(404, 'User not found'));
+      return next(createError(404, 'Photographer not found'));
     }
-    res.status(200).json("User has been deleted");
+    res.status(200).json("Photographer has been deleted");
   } catch (err) {
-    next(createError(500, 'Error deleting user'));
+    next(createError(500, 'Error deleting Photographer: ' + err));
   }
 });
 
