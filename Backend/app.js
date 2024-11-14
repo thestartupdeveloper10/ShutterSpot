@@ -12,6 +12,7 @@ const contactRouter = require('./controllers/contact');
 const mpesaRouter = require('./controllers/mpesa');
 const photographerRouter = require('./controllers/photographer');
 const clientRouter = require('./controllers/clientProfile')
+const bookingsRouter = require('./controllers/booking');
 
 mongoose.set('strictQuery', false);
 
@@ -36,6 +37,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/photographers', photographerRouter);
 app.use('/api/client', clientRouter);
+app.use('/api/book', bookingsRouter);
 app.use('/api/checkout', mpesaRouter);
 
 app.use(middleware.unknownEndpoint);

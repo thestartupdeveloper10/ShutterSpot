@@ -13,10 +13,13 @@ const clientRouter = express.Router();
 clientRouter.post("/", verifyToken, async (req, res, next) => {
     try {
       const { phone, location, profilePic  } = req.body;
-      const { id: userId, role } = req.user;
+      const { id, role } = req.user;
   
       // Ensure the user is a client, not a photographer
-      const user = await prisma.user.findUnique({ where: { id: userId } });
+      const user = await prisma.user.findUnique({ where: { id: id } });
+
+      console.log("User is :", user);
+
       if (!user || user.role !== 'client') {
         return next(createError(403, 'Only clients can create a profile.'));
       }
@@ -24,7 +27,7 @@ clientRouter.post("/", verifyToken, async (req, res, next) => {
       // Create ClientProfile
       const clientProfile = await prisma.clientProfile.create({
         data: {
-          userId,
+          userId:id,
           phone,
           location,
           profilePic: profilePic
@@ -36,6 +39,7 @@ clientRouter.post("/", verifyToken, async (req, res, next) => {
         clientProfile,
       });
     } catch (error) {
+      console.error("Prisma error:", error);
       next(createError(500, 'Error creating client profile'));
     }
   });
@@ -76,12 +80,13 @@ clientRouter.delete("/:id", verifyToken, async (req, res, next) => {
     }
     res.status(200).json("User has been deleted");
   } catch (err) {
+    console.log("prism error", err);
     next(createError(500, 'Error deleting user'));
   }
 });
 
 // GET USER
-clientRouter.get("/find/:id", verifyToken, verifyTokenAndAdmin, async (req, res, next) => {
+clientRouter.get("/find/:id", verifyToken,verifyTokenAndAdmin, async (req, res, next) => {
   try {
     const user = await prisma.clientProfile.findFirst({
       where: {
@@ -109,6 +114,7 @@ clientRouter.get("/", verifyToken, verifyTokenAndAdmin, async (req, res, next) =
       }})
     res.status(200).json(users);
   } catch (err) {
+    console.log("prism error", err)
     next(createError(500, 'Error retrieving users'));
   }
 });
