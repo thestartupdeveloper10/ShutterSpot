@@ -41,7 +41,7 @@ bookingRouter.post("/", verifyToken, async (req, res, next) => {
   
 
 // UPDATE BOOKING
-bookingRouter.put("/:id", verifyToken, verifyTokenAndAuthorization, async (req, res, next) => {
+bookingRouter.put("/:id", verifyToken, async (req, res, next) => {
   try {
     const updatedBooking = await prisma.booking.update({
       where: { id: req.params.id },
@@ -59,7 +59,7 @@ bookingRouter.put("/:id", verifyToken, verifyTokenAndAuthorization, async (req, 
 });
 
 // DELETE BOOKING
-bookingRouter.delete("/:id", verifyToken, verifyTokenAndAuthorization, async (req, res, next) => {
+bookingRouter.delete("/:id", verifyToken, async (req, res, next) => {
   try {
     const deletedBooking = await prisma.booking.delete({ where: { id: req.params.id } });
     if (!deletedBooking) {
@@ -67,6 +67,7 @@ bookingRouter.delete("/:id", verifyToken, verifyTokenAndAuthorization, async (re
     }
     res.status(200).json("Booking has been deleted");
   } catch (err) {
+    console.log("prisma error:", err);
     next(createError(500, "Error deleting booking"));
   }
 });
