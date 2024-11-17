@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -10,148 +9,112 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Filter } from "lucide-react";
 import NavBar from '@/component/NavBar';
 import Footer from '@/component/Footer';
+import { publicRequest } from '@/service/requestMethods';
+import { Link } from 'react-router-dom';
 
-// Mock data for photographers
-const mockPhotographers = [
-  { 
-    id: 1, 
-    name: "Alice Johnson", 
-    region: "New York", 
-    price: 150, 
-    availability: ["Weekends"], 
-    types: ["Wedding", "Portrait"], 
-    imageUrl: "https://cdn.pixabay.com/photo/2020/01/07/23/01/sketch-4748895_1280.jpg" 
-  },
-  { 
-    id: 2, 
-    name: "Bob Smith", 
-    region: "Los Angeles", 
-    price: 200, 
-    availability: ["Weekdays", "Weekends"], 
-    types: ["Fashion", "Event"], 
-    imageUrl: "https://cdn.pixabay.com/photo/2019/12/04/09/30/man-4672229_1280.jpg" 
-  },
-  { 
-    id: 3, 
-    name: "Charlie Brown", 
-    region: "Chicago", 
-    price: 175, 
-    availability: ["Weekdays"], 
-    types: ["Landscape", "Architecture"], 
-    imageUrl: "https://cdn.pixabay.com/photo/2016/09/24/03/20/man-1690965_1280.jpg" 
-  },
-  { 
-    id: 4, 
-    name: "Diana Ross", 
-    region: "Miami", 
-    price: 225, 
-    availability: ["Weekends"], 
-    types: ["Wedding", "Fashion"], 
-    imageUrl: "https://cdn.pixabay.com/photo/2019/09/01/10/13/portrait-4444764_1280.jpg" 
-  },
-  { 
-    id: 5, 
-    name: "Ethan Hunt", 
-    region: "Seattle", 
-    price: 160, 
-    availability: ["Weekdays", "Weekends"], 
-    types: ["Portrait", "Event"], 
-    imageUrl: "https://cdn.pixabay.com/photo/2018/04/27/03/50/portrait-3353699_1280.jpg" 
-  },
-];
+// Helper function to extract price range values
+const extractPriceRange = (priceString) => {
+  const numbers = priceString.match(/\d+/g);
+  return numbers ? [parseInt(numbers[0]), parseInt(numbers[1])] : [0, 3000]; // Default range if parsing fails
+};
 
-const regions = ["New York", "Los Angeles", "Chicago", "Miami", "Seattle"];
-const shootTypes = ["Wedding", "Portrait", "Fashion", "Event", "Landscape", "Architecture"];
+// Helper function to get unique values from array of objects
+const getUniqueValues = (data, key) => {
+  const values = new Set();
+  data.forEach(item => {
+    if (Array.isArray(item[key])) {
+      item[key].forEach(value => values.add(value));
+    } else {
+      values.add(item[key]);
+    }
+  });
+  return Array.from(values);
+};
 
-// Extracted Filter Component
 const FilterPanel = ({ 
   priceRange, 
   setPriceRange, 
-  selectedRegion, 
-  setSelectedRegion,
+  selectedLocation, 
+  setSelectedLocation,
   selectedAvailability,
   setSelectedAvailability,
-  selectedTypes,
-  setSelectedTypes,
-  className = ""
+  selectedServices,
+  setSelectedServices,
+  locations,
+  services,
+  maxPrice,
+  minPrice
 }) => (
-  <Card className={className}>
-    <CardContent className="p-4 space-y-4">
+  <Card className="p-4 space-y-4">
+    <CardContent>
       <h2 className="text-xl font-semibold mb-4">Filters</h2>
       
       {/* Price Range Filter */}
       <div>
-        <Label>Price Range</Label>
+        <Label>Price Range (USD)</Label>
         <div className="flex justify-between mb-2">
           <span>${priceRange[0]}</span>
           <span>${priceRange[1]}</span>
         </div>
         <Slider
-          min={0}
-          max={300}
-          step={10}
+          min={minPrice}
+          max={maxPrice}
+          step={100}
           value={priceRange}
           onValueChange={setPriceRange}
+          className="mt-4"
         />
       </div>
 
-      {/* Region Filter */}
-      <div>
-        <Label>Region</Label>
-        <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a region" />
+      {/* Location Filter */}
+      <div className="mt-6">
+        <Label>Location</Label>
+        <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+          <SelectTrigger className="mt-2">
+            <SelectValue placeholder="Select a location" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Regions</SelectItem>
-            {regions.map(region => (
-              <SelectItem key={region} value={region}>{region}</SelectItem>
+            <SelectItem value="all">All Locations</SelectItem>
+            {locations.map(location => (
+              <SelectItem key={location} value={location}>{location}</SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
       {/* Availability Filter */}
-      <div>
+      <div className="mt-6">
         <Label>Availability</Label>
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="weekdays" 
-              checked={selectedAvailability.Weekdays}
-              onCheckedChange={(checked) => 
-                setSelectedAvailability(prev => ({ ...prev, Weekdays: checked }))
-              }
-            />
-            <label htmlFor="weekdays">Weekdays</label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="weekends" 
-              checked={selectedAvailability.Weekends}
-              onCheckedChange={(checked) => 
-                setSelectedAvailability(prev => ({ ...prev, Weekends: checked }))
-              }
-            />
-            <label htmlFor="weekends">Weekends</label>
-          </div>
+        <div className="space-y-2 mt-2">
+          {['Weekends', 'Weekdays', 'Flexible for travel'].map(availability => (
+            <div key={availability} className="flex items-center space-x-2">
+              <Checkbox 
+                id={availability} 
+                checked={selectedAvailability[availability]}
+                onCheckedChange={(checked) => 
+                  setSelectedAvailability(prev => ({ ...prev, [availability]: checked }))
+                }
+              />
+              <label htmlFor={availability}>{availability}</label>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Shoot Types Filter */}
-      <div>
-        <Label>Types of Shoot</Label>
-        <div className="space-y-2">
-          {shootTypes.map(type => (
-            <div key={type} className="flex items-center space-x-2">
+      {/* Services Filter */}
+      <div className="mt-6">
+        <Label>Services</Label>
+        <div className="space-y-2 mt-2">
+          {services.map(service => (
+            <div key={service} className="flex items-center space-x-2">
               <Checkbox 
-                id={type} 
-                checked={selectedTypes[type]}
+                id={service} 
+                checked={selectedServices[service]}
                 onCheckedChange={(checked) => 
-                  setSelectedTypes(prev => ({ ...prev, [type]: checked }))
+                  setSelectedServices(prev => ({ ...prev, [service]: checked }))
                 }
               />
-              <label htmlFor={type}>{type}</label>
+              <label htmlFor={service}>{service}</label>
             </div>
           ))}
         </div>
@@ -160,78 +123,250 @@ const FilterPanel = ({
   </Card>
 );
 
-// Photographer Card Component
-const PhotographerCard = ({ photographer }) => (
-  <Card key={photographer.id}>
-    <img src={photographer.imageUrl} alt={photographer.name} className="w-full h-60 object-cover" />
-    <CardContent className="p-4">
-      <h3 className="text-lg font-semibold">{photographer.name}</h3>
-      <p className="text-sm text-gray-600">{photographer.region}</p>
-      <p className="text-sm font-medium">${photographer.price}/hour</p>
-      <p className="text-sm">{photographer.types.join(", ")}</p>
-    </CardContent>
-    <CardFooter>
-      <Button className="w-full">View Profile</Button>
-    </CardFooter>
-  </Card>
-);
+const PhotographerCard = ({ photographer }) => {
+  const [minPrice, maxPrice] = extractPriceRange(photographer.priceRange);
+  console.log(photographer.id)
+  
+  return (
+    <Card className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+      {/* Image Container with Overlay */}
+      <div className="relative overflow-hidden">
+        <img 
+          src={photographer.profilePic || photographer.photos[0]} 
+          alt={photographer.name} 
+          className="h-72 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+
+      {/* Content Section */}
+      <CardContent className="p-6">
+        {/* Header Section */}
+        <div className="mb-4">
+          <div className="flex items-start justify-between">
+            <h3 className="text-xl font-semibold text-gray-900">{photographer.name}</h3>
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+              {photographer.experienceYears}+ years
+            </span>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="text-sm text-gray-600 flex items-center gap-1">
+              <svg 
+                className="w-4 h-4" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+                />
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+                />
+              </svg>
+              {photographer.location}
+            </div>
+          </div>
+        </div>
+
+        {/* Services Tags */}
+        <div className="mb-4">
+          <div className="flex flex-wrap gap-1">
+            {photographer.services.slice(0, 3).map((service, index) => (
+              <span 
+                key={index}
+                className="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs text-gray-600"
+              >
+                {service}
+              </span>
+            ))}
+            {photographer.services.length > 3 && (
+              <span className="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs text-gray-600">
+                +{photographer.services.length - 3} more
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Price and Availability */}
+        <div className="flex items-center justify-between border-t pt-4">
+          <div>
+            <p className="text-sm text-gray-500">Starting from</p>
+            <p className="text-lg font-semibold text-gray-900">{photographer.priceRange}</p>
+          </div>
+          <Link to={`/photographer/${photographer.id}`}>
+          <Button 
+            className="bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+          >
+            View Profile
+          </Button>
+          </Link>
+        </div>
+      </CardContent>
+
+      {/* Quick Info Overlay */}
+      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {photographer.cameras && photographer.cameras.length > 0 && (
+          <div className="bg-black/70 text-white rounded-full p-2" title="Camera Equipment">
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+              />
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </div>
+        )}
+        {photographer.languages && photographer.languages.length > 0 && (
+          <div 
+            className="bg-black/70 text-white rounded-full p-2" 
+            title={`Languages: ${photographer.languages.join(', ')}`}
+          >
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
 
 const PhotographersListingPage = () => {
-  // State management
-  const [priceRange, setPriceRange] = useState([0, 300]);
-  const [selectedRegion, setSelectedRegion] = useState("all");
-  const [selectedAvailability, setSelectedAvailability] = useState({
-    Weekdays: false,
-    Weekends: false,
-  });
-  const [selectedTypes, setSelectedTypes] = useState({});
+  const [photographers, setPhotographers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Initialize selectedTypes state
-  useMemo(() => {
-    const typesObj = {};
-    shootTypes.forEach(type => {
-      typesObj[type] = false;
-    });
-    setSelectedTypes(typesObj);
+  // Fetch photographers data
+  useEffect(() => {
+    const fetchPhotographers = async () => {
+      setIsLoading(true);
+      try {
+        const res = await publicRequest.get("photographers");
+        setPhotographers(res.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPhotographers();
   }, []);
+
+ 
+
+  // Calculate price ranges and other filter options from data
+  const [minPrice, maxPrice, locations, services] = useMemo(() => {
+    if (photographers.length === 0) return [0, 3000, [], []];
+    
+    const priceRanges = photographers.map(p => extractPriceRange(p.priceRange));
+    const minP = Math.min(...priceRanges.map(range => range[0]));
+    const maxP = Math.max(...priceRanges.map(range => range[1]));
+    
+    return [
+      minP,
+      maxP,
+      getUniqueValues(photographers, 'location'),
+      getUniqueValues(photographers, 'services')
+    ];
+  }, [photographers]);
+
+  // State management - initialize with full range to show all photographers
+  const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedAvailability, setSelectedAvailability] = useState({});
+  const [selectedServices, setSelectedServices] = useState({});
+
+  // Update price range when min/max prices are calculated
+  useEffect(() => {
+    setPriceRange([minPrice, maxPrice]);
+  }, [minPrice, maxPrice]);
 
   // Filter photographers based on selected filters
   const filteredPhotographers = useMemo(() => {
-    return mockPhotographers.filter(photographer => {
-      const priceInRange = photographer.price >= priceRange[0] && photographer.price <= priceRange[1];
-      const regionMatch = selectedRegion === "all" || photographer.region === selectedRegion;
+    return photographers.filter(photographer => {
+      const [photographerMinPrice, photographerMaxPrice] = extractPriceRange(photographer.priceRange);
+      
+      // Price range filter
+      const priceInRange = 
+        photographerMinPrice <= priceRange[1] && photographerMaxPrice >= priceRange[0];
+      
+      // Location filter
+      const locationMatch = 
+        selectedLocation === "all" || photographer.location === selectedLocation;
+      
+      // Availability filter
       const availabilityMatch = 
-        (!selectedAvailability.Weekdays && !selectedAvailability.Weekends) ||
-        (selectedAvailability.Weekdays && photographer.availability.includes("Weekdays")) ||
-        (selectedAvailability.Weekends && photographer.availability.includes("Weekends"));
-      const typeMatch = 
-        Object.values(selectedTypes).every(v => v === false) ||
-        photographer.types.some(type => selectedTypes[type]);
+        Object.values(selectedAvailability).every(v => !v) ||
+        photographer.availability.some(avail => selectedAvailability[avail]);
+      
+      // Services filter
+      const servicesMatch = 
+        Object.values(selectedServices).every(v => !v) ||
+        photographer.services.some(service => selectedServices[service]);
 
-      return priceInRange && regionMatch && availabilityMatch && typeMatch;
+      return priceInRange && locationMatch && availabilityMatch && servicesMatch;
     });
-  }, [priceRange, selectedRegion, selectedAvailability, selectedTypes]);
+  }, [photographers, priceRange, selectedLocation, selectedAvailability, selectedServices]);
 
-  // Props for FilterPanel
+  if (isLoading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center min-h-screen text-red-500">Error: {error}</div>;
+  }
+
   const filterProps = {
     priceRange,
     setPriceRange,
-    selectedRegion,
-    setSelectedRegion,
+    selectedLocation,
+    setSelectedLocation,
     selectedAvailability,
     setSelectedAvailability,
-    selectedTypes,
-    setSelectedTypes,
+    selectedServices,
+    setSelectedServices,
+    locations,
+    services,
+    maxPrice,
+    minPrice
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar />
-      <div className=" py-28 md:mx-24 mx-5 px-4">
+      <div className="py-28 md:mx-24 mx-5 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Find a Photographer</h1>
           
-          {/* Mobile Filter Button */}
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
@@ -247,14 +382,12 @@ const PhotographersListingPage = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Desktop Filter - Sticky */}
           <div className="hidden md:block">
             <div className="sticky top-24 overflow-y-auto max-h-[calc(100vh-6rem)]">
               <FilterPanel {...filterProps} />
             </div>
           </div>
 
-          {/* Photographers Grid */}
           <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
             {filteredPhotographers.map(photographer => (
               <PhotographerCard key={photographer.id} photographer={photographer} />

@@ -17,6 +17,7 @@ import family from '../assets/imgs/couples/family.jpg';
 
 
 
+
 const Capture = () => {
 
   const testimonials = [

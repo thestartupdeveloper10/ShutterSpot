@@ -19,7 +19,7 @@ import { logout } from '../redux/features/user/userSlice';
 
 const clientTabs = [
   { text: "Home", link: "/" },
-  { text: "Find Photographer", link: "/find-photographer" },
+  { text: "Find Photographer", link: "/photographers" },
   { text: "Profile", link: "/clientProfile" },
 ];
 

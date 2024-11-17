@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Camera, Aperture, Globe, Users, Smile, Camera as CameraIcon, Shield, ArrowUp, Calendar, Mail, Phone, MessageSquare } from 'lucide-react';
 import NavBar from '@/component/NavBar';
 import Footer from '@/component/Footer';
@@ -25,25 +26,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { publicRequest } from '@/service/requestMethods';
 
-// Mock data remains the same as your original code
-const photographerData = {
-  name: "Cliffe",
-  location: "Pleasanton",
-  experience: "15 years of experience",
-  about: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti illum perspiciatis modi quidem nulla, nihil, magnam molestiae at reiciendis pariatur omnis mollitia voluptate sit dolore, nesciunt sunt fuga impedit expedita.",
-  portfolio: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti illum perspiciatis modi quidem nulla, nihil, magnam molestiae at reiciendis pariatur omnis mollitia voluptate sit dolore, nesciunt sunt fuga impedit expedita.",
-  booking: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti illum perspiciatis modi quidem nulla, nihil, magnam molestiae at reiciendis pariatur omnis mollitia voluptate sit dolore, nesciunt sunt fuga impedit expedita.",
-  equipment: {
-    camera: "Canon 5d MKIV",
-    lenses: "35mm, 85mm, 70-200mm, 14-24mm"
-  },
-  languages: ["English"],
-  skills: ["Large Groups", "Capturing Emotions", "Candid Moments", "Story Telling", "Going the Extra Mile"]
-};
-
-const BookingForm = () => {
-  const [formData, setFormData] = React.useState({
+const BookingForm = ({ photographerName, photographerPhone }) => {
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
@@ -62,7 +48,6 @@ const BookingForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
-    // Handle form submission
   };
 
   return (
@@ -140,39 +125,41 @@ const PhotoGrid = ({ images }) => (
   <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
     <div className="md:col-span-2 flex flex-col gap-4">
       <div className="relative h-64 md:h-80 overflow-hidden rounded-lg">
-        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[0]} alt="Wedding" />
+        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[0]} alt="Photo 1" />
       </div>
       <div className="relative h-64 md:h-80 overflow-hidden rounded-lg">
-        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[1]} alt="Food" />
+        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[1]} alt="Photo 2" />
       </div>
     </div>
     <div className="md:col-span-3">
       <div className="relative h-[calc(100%-1rem)] overflow-hidden rounded-lg">
-        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[2]} alt="Studio" />
+        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[2]} alt="Photo 3" />
       </div>
     </div>
     <div className="md:col-span-2 flex flex-col gap-4">
       <div className="relative h-64 md:h-80 overflow-hidden rounded-lg">
-        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[3]} alt="Landscape" />
+        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[3]} alt="Photo 4" />
       </div>
       <div className="relative h-64 md:h-80 overflow-hidden rounded-lg">
-        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[4]} alt="Portrait" />
+        <img className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" src={images[4]} alt="Photo 5" />
       </div>
     </div>
   </div>
 );
 
-const ProfileHeader = ({ name, location, experience, image }) => (
+const ProfileHeader = ({ name, location, experience, image, status }) => (
   <Card className="mt-8">
     <CardContent className="flex flex-col md:flex-row items-center gap-6 p-6">
       <div className="relative">
         <div className="rounded-full h-32 w-32 overflow-hidden">
           <img className="w-full h-full object-cover" src={image} alt={name} />
         </div>
-        <div className="absolute -top-2 -right-2 flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
-          <span className="text-sm text-green-700">Available</span>
-          <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-        </div>
+        {status === 'available' && (
+          <div className="absolute -top-2 -right-2 flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
+            <span className="text-sm text-green-700">Available</span>
+            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+          </div>
+        )}
       </div>
       <div className="text-center md:text-left">
         <h1 className="text-3xl font-bold mb-2">{name}</h1>
@@ -209,11 +196,13 @@ const ProfileHeader = ({ name, location, experience, image }) => (
   </Card>
 );
 
-const QuickContact = () => (
+const QuickContact = ({ phone }) => (
   <div className="fixed bottom-6 right-6 flex flex-col gap-3">
-    <Button size="icon" variant="outline" className="rounded-full h-12 w-12 bg-white shadow-lg">
-      <Phone className="h-5 w-5" />
-    </Button>
+    <a href={`tel:${phone}`}>
+      <Button size="icon" variant="outline" className="rounded-full h-12 w-12 bg-white shadow-lg">
+        <Phone className="h-5 w-5" />
+      </Button>
+    </a>
     <Button size="icon" variant="outline" className="rounded-full h-12 w-12 bg-white shadow-lg">
       <Mail className="h-5 w-5" />
     </Button>
@@ -224,29 +213,49 @@ const QuickContact = () => (
 );
 
 const Photographer_Details = () => {
+  const [photographer, setPhotographer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchPhotographer = async () => {
+      try {
+        const response = await publicRequest.get(`photographers/find/${id}`);
+        setPhotographer(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching photographer:', err);
+        setError('Failed to load photographer details. Please try again later.');
+        setLoading(false);
+      }
+    };
+
+    fetchPhotographer();
+  }, [id]);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
+  if (!photographer) return <div className="min-h-screen flex items-center justify-center">Photographer not found</div>;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar />
       <main className="py-28 md:mx-24 mx-5">
-        <PhotoGrid images={[
-          'https://cdn.pixabay.com/photo/2022/01/13/00/05/austria-6934162_960_720.jpg',
-          'https://cdn.pixabay.com/photo/2023/09/17/19/43/lizard-8259209_960_720.jpg',
-          'https://cdn.pixabay.com/photo/2024/02/07/14/02/tree-8559118_960_720.jpg',
-          'https://cdn.pixabay.com/photo/2023/11/16/18/46/mushroom-8392883_960_720.jpg',
-          'https://cdn.pixabay.com/photo/2024/07/25/08/47/flower-8920535_960_720.jpg'
-        ]} />
+        <PhotoGrid images={photographer.photos} />
         
         <ProfileHeader 
-          name={photographerData.name}
-          location={photographerData.location}
-          experience={photographerData.experience}
-          image="https://cdn.pixabay.com/photo/2023/12/11/12/51/lynx-8443540_960_720.jpg"
+          name={photographer.name}
+          location={photographer.location}
+          experience={`${photographer.experienceYears} years of experience`}
+          image={photographer.profilePic}
+          status={photographer.status}
         />
 
         <Tabs defaultValue="about" className="mt-8">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+            <TabsTrigger value="portfolio">Services & Price</TabsTrigger>
             <TabsTrigger value="equipment">Equipment & Skills</TabsTrigger>
           </TabsList>
 
@@ -256,7 +265,31 @@ const Photographer_Details = () => {
                 <CardTitle>About Me</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">{photographerData.about}</p>
+                <p className="text-gray-600">{photographer.about}</p>
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">Education</h3>
+                  <p className="text-gray-600">{photographer.education}</p>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">Languages</h3>
+                  <div className="flex gap-2">
+                    {photographer.languages.map((language, index) => (
+                      <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                        {language}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">Availability</h3>
+                  <div className="flex gap-2">
+                    {photographer.availability.map((time, index) => (
+                      <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                        {time}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -264,10 +297,31 @@ const Photographer_Details = () => {
           <TabsContent value="portfolio">
             <Card>
               <CardHeader>
-                <CardTitle>Portfolio</CardTitle>
+                <CardTitle>Services & Pricing</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">{photographerData.portfolio}</p>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold mb-2">Services Offered</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {photographer.services.map((service, index) => (
+                        <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Price Range</h3>
+                    <p className="text-gray-600">{photographer.priceRange}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Portfolio</h3>
+                    <a href={photographer.portfolio} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      View Full Portfolio
+                    </a>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -285,15 +339,23 @@ const Photographer_Details = () => {
                       <div className="flex items-start gap-3">
                         <Camera className="text-gray-600" />
                         <div>
-                          <p className="font-medium">Camera</p>
-                          <p className="text-gray-600">{photographerData.equipment.camera}</p>
+                          <p className="font-medium">Cameras</p>
+                          <ul className="text-gray-600 list-disc list-inside">
+                            {photographer.cameras.map((camera, index) => (
+                              <li key={index}>{camera}</li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
                         <Aperture className="text-gray-600" />
                         <div>
                           <p className="font-medium">Lenses</p>
-                          <p className="text-gray-600">{photographerData.equipment.lenses}</p>
+                          <ul className="text-gray-600 list-disc list-inside">
+                            {photographer.lenses.map((lens, index) => (
+                              <li key={index}>{lens}</li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
                     </div>
@@ -301,17 +363,16 @@ const Photographer_Details = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Skills</h3>
                     <div className="flex flex-wrap gap-2">
-                      {photographerData.skills.map((skill, index) => (
+                      {photographer.skills.map((skill, index) => (
                         <span key={index} className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full text-sm">
                           {index === 0 ? <Users size={16} /> :
                            index === 1 ? <Smile size={16} /> :
                            index === 2 ? <CameraIcon size={16} /> :
-                           index === 3 ? <Shield size={16} /> :
-                           <ArrowUp size={16} />}
+                           <Shield size={16} />}
                           {skill}
                         </span>
                       ))}
-                    </div>
+                      </div>
                   </div>
                 </div>
               </CardContent>
@@ -319,7 +380,7 @@ const Photographer_Details = () => {
           </TabsContent>
         </Tabs>
       </main>
-      <QuickContact />
+      <QuickContact phone={photographer.phone} />
       <Footer />
     </div>
   );

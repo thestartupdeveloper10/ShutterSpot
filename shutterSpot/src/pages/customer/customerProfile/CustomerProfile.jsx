@@ -49,6 +49,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import NavBar from '@/component/NavBar';
 import Footer from '@/component/Footer';
+import EditProfileDialog from '@/component/EditProfileDialog';
 
 // Mock Customer Data
 const customerData = {
@@ -288,6 +289,7 @@ const CustomerProfile = () => {
     <div className="min-h-screen bg-gray-50">
         <NavBar/>
       <div className="py-28 md:mx-24 mx-5 px-4">
+
         {/* Profile Header */}
         <Card className="mb-8">
           <CardContent className="p-6">
@@ -305,6 +307,7 @@ const CustomerProfile = () => {
                   className="absolute bottom-0 right-0 rounded-full"
                 >
                   <Camera className="h-4 w-4" />
+
                 </Button>
               </div>
               <div className="flex-1">
@@ -327,7 +330,12 @@ const CustomerProfile = () => {
                       </div>
                     </div>
                   </div>
-                  <Button>Edit Profile</Button>
+                  <EditProfileDialog 
+                  customerData={customerData}
+                  onUpdateProfile={(updatedProfile) => {
+    // Update your local state/refresh data
+    console.log('Profile updated:', updatedProfile);
+  }}/>
                 </div>
               </div>
             </div>

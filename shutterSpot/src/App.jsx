@@ -22,12 +22,12 @@ function App() {
         <div className="main">
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/photographer' element={<Photographer_Details />} />
+            <Route path='/photographer/:id' element={<Photographer_Details />} />
             <Route path='/book' element={< Book/>} />
-            <Route path='/find-photographer' element={<PhotographersListingPage/> } />
+            <Route path='/photographers' element={<PhotographersListingPage/> } />
             <Route path='/auth' element={<AuthPage/> } />
             <Route path='/photographer-dashboard' element={<PhotographerDashboard/> } />
-            <Route path='/photographerDetails' element={<PhotographerDetailsPage/> } />
+            <Route path='/photographer-details' element={<PhotographerDetailsPage/> } />
             <Route path='/photographerProfile' element={<UserProfile/> } />
             <Route path='/clientProfile' element={<CustomerProfile/> } />
           </Routes>

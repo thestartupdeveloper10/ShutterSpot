@@ -122,8 +122,8 @@ const AuthPage = () => {
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="client">Client</SelectItem>
-                      <SelectItem value="photographer">Photographer</SelectItem>
+                      <SelectItem value="client">client</SelectItem>
+                      <SelectItem value="photographer">photographer</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
