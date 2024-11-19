@@ -86,7 +86,7 @@ clientRouter.delete("/:id", verifyToken, async (req, res, next) => {
 });
 
 // GET USER
-clientRouter.get("/find/:id", verifyToken,verifyTokenAndAdmin, async (req, res, next) => {
+clientRouter.get("/find/:id", verifyToken, async (req, res, next) => {
   try {
     const user = await prisma.clientProfile.findFirst({
       where: {

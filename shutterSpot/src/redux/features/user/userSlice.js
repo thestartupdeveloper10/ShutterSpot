@@ -1,80 +1,67 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { publicRequest } from "../../../service/requestMethods";
-
-export const login = createAsyncThunk(
-  'user/login',
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const response = await publicRequest.post('/auth/login', credentials);
-      localStorage.setItem('token', response.data.token);
-      return response.data.user;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const register = createAsyncThunk(
-  'user/register',
-  async (userData, { rejectWithValue }) => {
-    try {
-      const response = await publicRequest.post('/auth/register', userData);
-      localStorage.setItem('token', response.data.token);
-      return response.data.user;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentUser: null,
-  isLoading: false,
-  error: null,
+  userId: null,
+  isFetching: false,
+  error: false,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    loginStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+    },
+    loginSuccess: (state, action) => {
+      state.isFetching = false;
+      state.currentUser = action.payload;
+      state.userId = action.payload.id;
+    },
+    loginFailure: (state) => {
+      state.isFetching = false;
+      state.error = true;
+    },
+    resetError: (state) => {
+      state.error = false;
+    },
     logout: (state) => {
       state.currentUser = null;
-      localStorage.removeItem('token');
+      state.userId = null;
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(login.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.currentUser = action.payload;
-      })
-      .addCase(login.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-      .addCase(register.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(register.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.currentUser = action.payload;
-      })
-      .addCase(register.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      });
+    registerStart: (state) => {
+      state.isFetching = true;
+    },
+    registerSuccess: (state, action) => {
+      state.isFetching = false;
+      state.currentUser = action.payload;
+      state.userId = action.payload.id;
+    },
+    registerFailure: (state) => {
+      state.isFetching = false;
+      state.error = true;
+    },
+    updateUser: (state, action) => {
+      state.currentUser = action.payload;
+    },
   },
 });
 
-export const { logout } = userSlice.actions;
+export const {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  logout,
+  registerStart,
+  registerSuccess,
+  registerFailure,
+  resetError,
+  updateUser,
+} = userSlice.actions;
 
 export const selectCurrentUser = (state) => state.user.currentUser;
-export const selectIsLoading = (state) => state.user.isLoading;
-export const selectError = (state) => state.user.error;
+export const selectUserId = (state) => state.user.userId;
 
 export default userSlice.reducer;

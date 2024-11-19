@@ -1,119 +1,30 @@
 import React, { useState } from 'react';
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Camera,
-  Settings,
-  Image as ImageIcon,
-  Calendar,
-  Clock,
-  Heart,
-  Star,
-  Edit,
-  Trash2,
-  Grid,
-  List,
-  Share2,
-  Instagram,
-  Facebook,
-  Twitter,
-  Link as LinkIcon
+  User, Mail, Phone, MapPin, Camera, Settings, 
+  Image as ImageIcon, Calendar, Clock, Heart,
+  Star, Edit, Trash2, Grid, List, Share2,
+  Instagram, Facebook, Twitter, Link as LinkIcon,
+  Plus // Added missing Plus import
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
+  Tabs, TabsContent, TabsList, TabsTrigger,
 } from "@/components/ui/tabs";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import NavBar from '@/component/NavBar';
 import Footer from '@/component/Footer';
 
-// Mock Data
-const userData = {
-  id: "1",
-  name: "Sarah Anderson",
-  role: "Professional Photographer",
-  email: "sarah.anderson@example.com",
-  phone: "+1 (555) 123-4567",
-  location: "San Francisco, CA",
-  bio: "Award-winning photographer specializing in portraits and landscapes. Passionate about capturing moments that tell stories.",
-  memberSince: "January 2020",
-  website: "www.sarahanderson.com",
-  social: {
-    instagram: "@sarah.shoots",
-    facebook: "sarahandersonphoto",
-    twitter: "@sarah_shoots"
-  },
-  stats: {
-    completedProjects: 156,
-    totalEarnings: 52480,
-    averageRating: 4.8,
-    totalReviews: 98,
-    responseRate: 98,
-    responseTime: "2 hours"
-  },
-  bookings: [
-    {
-      id: 1,
-      client: "John Doe",
-      date: "2024-11-15",
-      time: "14:00",
-      type: "Wedding Photography",
-      status: "upcoming",
-      price: 1200
-    },
-    {
-      id: 2,
-      client: "Emma Wilson",
-      date: "2024-11-12",
-      time: "10:00",
-      type: "Portrait Session",
-      status: "upcoming",
-      price: 300
-    },
-    {
-      id: 3,
-      client: "Michael Brown",
-      date: "2024-11-01",
-      time: "15:30",
-      type: "Family Photos",
-      status: "completed",
-      price: 450
-    }
-  ],
-  portfolio: [
-    { id: 1, image: "/api/placeholder/600/400", title: "Beach Wedding", likes: 245 },
-    { id: 2, image: "/api/placeholder/600/400", title: "Mountain Landscape", likes: 189 },
-    { id: 3, image: "/api/placeholder/600/400", title: "Corporate Event", likes: 156 },
-    { id: 4, image: "/api/placeholder/600/400", title: "Family Portrait", likes: 298 },
-    { id: 5, image: "/api/placeholder/600/400", title: "Fashion Shoot", likes: 342 },
-    { id: 6, image: "/api/placeholder/600/400", title: "Product Photography", likes: 167 }
-  ]
-};
-
+// StatCard Component
 const StatCard = ({ title, value, icon: Icon, description }) => (
   <Card>
     <CardContent className="flex items-center p-6">
@@ -131,11 +42,27 @@ const StatCard = ({ title, value, icon: Icon, description }) => (
   </Card>
 );
 
+// BookingCard Component
 const BookingCard = ({ booking }) => {
   const statusColors = {
-    upcoming: "bg-blue-100 text-blue-800",
+    pending: "bg-yellow-100 text-yellow-800",
     completed: "bg-green-100 text-green-800",
     cancelled: "bg-red-100 text-red-800"
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -146,13 +73,13 @@ const BookingCard = ({ booking }) => {
             <Calendar className="h-6 w-6 text-gray-600" />
           </div>
           <div>
-            <h3 className="font-semibold">{booking.client}</h3>
-            <p className="text-sm text-gray-600">{booking.type}</p>
+            <h3 className="font-semibold">{booking.client?.user?.username || 'Client'}</h3>
+            <p className="text-sm text-gray-600">{booking.location}</p>
             <div className="flex items-center gap-2 mt-1">
               <Calendar className="h-4 w-4 text-gray-400" />
-              <span className="text-sm text-gray-600">{booking.date}</span>
+              <span className="text-sm text-gray-600">{formatDate(booking.startDate)}</span>
               <Clock className="h-4 w-4 text-gray-400 ml-2" />
-              <span className="text-sm text-gray-600">{booking.time}</span>
+              <span className="text-sm text-gray-600">{formatTime(booking.startDate)}</span>
             </div>
           </div>
         </div>
@@ -160,7 +87,7 @@ const BookingCard = ({ booking }) => {
           <Badge variant="outline" className={statusColors[booking.status]}>
             {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
           </Badge>
-          <p className="font-semibold">${booking.price}</p>
+          <p className="font-semibold">${booking.totalPrice}</p>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -186,14 +113,15 @@ const BookingCard = ({ booking }) => {
   );
 };
 
+// PortfolioGrid Component
 const PortfolioGrid = ({ items, viewMode }) => (
   <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
-    {items.map((item) => (
-      <Card key={item.id} className={`overflow-hidden ${viewMode === 'list' ? 'flex' : ''}`}>
+    {items.map((item, index) => (
+      <Card key={index} className={`overflow-hidden ${viewMode === 'list' ? 'flex' : ''}`}>
         <div className={`relative ${viewMode === 'list' ? 'w-48' : 'w-full'}`}>
           <img
-            src={item.image}
-            alt={item.title}
+            src={item}
+            alt={`Portfolio item ${index + 1}`}
             className="w-full h-48 object-cover"
           />
           <Button
@@ -205,12 +133,7 @@ const PortfolioGrid = ({ items, viewMode }) => (
           </Button>
         </div>
         <CardContent className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-          <h3 className="font-semibold mb-2">{item.title}</h3>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Heart className="h-4 w-4 text-red-500" />
-              <span className="text-sm text-gray-600">{item.likes} likes</span>
-            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -237,12 +160,21 @@ const PortfolioGrid = ({ items, viewMode }) => (
   </div>
 );
 
-const UserProfile = () => {
+// Main UserProfile Component
+const UserProfile = ({ userData }) => {
   const [viewMode, setViewMode] = useState('grid');
+  const profile = userData.profile;
+
+  const stats = {
+    totalBookings: userData.bookings.length,
+    totalEarnings: userData.bookings.reduce((sum, booking) => sum + booking.totalPrice, 0),
+    experienceYears: profile.experienceYears,
+    responseRate: 98
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-        <NavBar />
+      <NavBar />
       <div className="py-28 md:mx-24 mx-5 px-4">
         {/* Profile Header */}
         <Card className="mb-8">
@@ -251,8 +183,8 @@ const UserProfile = () => {
               <div className="relative">
                 <div className="w-32 h-32 rounded-full overflow-hidden">
                   <img
-                    src="/api/placeholder/300/300"
-                    alt={userData.name}
+                    src={profile.profilePic}
+                    alt={profile.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -266,8 +198,8 @@ const UserProfile = () => {
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h1 className="text-2xl font-bold mb-1">{userData.name}</h1>
-                    <p className="text-gray-600 mb-4">{userData.role}</p>
+                    <h1 className="text-2xl font-bold mb-1">{profile.name}</h1>
+                    <p className="text-gray-600 mb-4">{profile.services.join(', ')}</p>
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Mail className="h-4 w-4" />
@@ -275,29 +207,30 @@ const UserProfile = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="h-4 w-4" />
-                        {userData.phone}
+                        {profile.phone}
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
-                        {userData.location}
+                        {profile.location}
                       </div>
                     </div>
                   </div>
                   <Button>Edit Profile</Button>
                 </div>
-                <div className="flex gap-4 mt-6">
-                  <Button variant="outline" size="sm">
-                    <Instagram className="h-4 w-4 mr-2" />
-                    Connect Instagram
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Facebook className="h-4 w-4 mr-2" />
-                    Connect Facebook
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Twitter className="h-4 w-4 mr-2" />
-                    Connect Twitter
-                  </Button>
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">About</h3>
+                  <p className="text-gray-600">{profile.about}</p>
+                </div>
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">Equipment</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.cameras.map((camera, index) => (
+                      <Badge key={index} variant="secondary">{camera}</Badge>
+                    ))}
+                    {profile.lenses.map((lens, index) => (
+                      <Badge key={index} variant="secondary">{lens}</Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -307,26 +240,24 @@ const UserProfile = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title="Completed Projects"
-            value={userData.stats.completedProjects}
-            icon={ImageIcon}
+            title="Total Bookings"
+            value={stats.totalBookings}
+            icon={Calendar}
           />
           <StatCard
             title="Total Earnings"
-            value={`$${userData.stats.totalEarnings}`}
+            value={`$${stats.totalEarnings}`}
             icon={LinkIcon}
           />
           <StatCard
-            title="Average Rating"
-            value={userData.stats.averageRating}
+            title="Experience"
+            value={`${stats.experienceYears} years`}
             icon={Star}
-            description={`${userData.stats.totalReviews} reviews`}
           />
           <StatCard
             title="Response Rate"
-            value={`${userData.stats.responseRate}%`}
+            value={`${stats.responseRate}%`}
             icon={Clock}
-            description={`Avg. ${userData.stats.responseTime}`}
           />
         </div>
 
@@ -370,7 +301,7 @@ const UserProfile = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <PortfolioGrid items={userData.portfolio} viewMode={viewMode} />
+                <PortfolioGrid items={profile.photos} viewMode={viewMode} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -399,146 +330,181 @@ const UserProfile = () => {
                   Manage your account settings and preferences
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-        <div className="space-y-6">
-                  {/* Personal Information */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Personal Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" defaultValue={userData.name} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" defaultValue={userData.email} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input id="phone" type="tel" defaultValue={userData.phone} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="location">Location</Label>
-                        <Input id="location" defaultValue={userData.location} />
-                      </div>
+              <CardContent className="space-y-8">
+                {/* Personal Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Personal Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" defaultValue={profile.name} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="bio">Bio</Label>
-                      <textarea
-                        id="bio"
-                        className="w-full min-h-[100px] px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        defaultValue={userData.bio}
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" defaultValue={userData.email} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input id="phone" type="tel" defaultValue={profile.phone} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="location">Location</Label>
+                      <Input id="location" defaultValue={profile.location} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="about">About</Label>
+                    <textarea
+                      id="about"
+                      className="w-full min-h-[100px] px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      defaultValue={profile.about}
+                    />
+                  </div>
+                </div>
+
+                {/* Professional Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Professional Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="experience">Years of Experience</Label>
+                      <Input 
+                        id="experience" 
+                        type="number" 
+                        defaultValue={profile.experienceYears} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="education">Education</Label>
+                      <Input 
+                        id="education" 
+                        defaultValue={profile.education} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="portfolio">Portfolio URL</Label>
+                      <Input 
+                        id="portfolio" 
+                        type="url" 
+                        defaultValue={profile.portfolio} 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="priceRange">Price Range</Label>
+                      <Input 
+                        id="priceRange" 
+                        defaultValue={profile.priceRange} 
                       />
                     </div>
                   </div>
+                </div>
 
-                  {/* Social Media Links */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Social Media</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="instagram">Instagram Handle</Label>
-                        <Input 
-                          id="instagram" 
-                          defaultValue={userData.social.instagram}
-                          icon={<Instagram className="h-4 w-4" />}
-                        />
+                {/* Equipment */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Equipment</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Cameras</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.cameras.map((camera, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                            {camera}
+                            <button className="ml-1 hover:text-red-500">
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                        <Button variant="outline" size="sm">
+                          <Camera className="h-4 w-4 mr-2" /> Add Camera
+                        </Button>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="facebook">Facebook Username</Label>
-                        <Input 
-                          id="facebook" 
-                          defaultValue={userData.social.facebook}
-                          icon={<Facebook className="h-4 w-4" />}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="twitter">Twitter Handle</Label>
-                        <Input 
-                          id="twitter" 
-                          defaultValue={userData.social.twitter}
-                          icon={<Twitter className="h-4 w-4" />}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="website">Website</Label>
-                        <Input 
-                          id="website" 
-                          defaultValue={userData.website}
-                          icon={<LinkIcon className="h-4 w-4" />}
-                        />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Lenses</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.lenses.map((lens, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                            {lens}
+                            <button className="ml-1 hover:text-red-500">
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                        <Button variant="outline" size="sm">
+                          <Camera className="h-4 w-4 mr-2" /> Add Lens
+                        </Button>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Notifications Settings */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Notifications</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>Email Notifications</Label>
-                          <p className="text-sm text-gray-500">Receive email updates about your bookings</p>
-                        </div>
-                        <Switch defaultChecked />
+                {/* Services & Skills */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Services & Skills</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Services Offered</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.services.map((service, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                            {service}
+                            <button className="ml-1 hover:text-red-500">
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                        <Button variant="outline" size="sm">
+                          <Plus className="h-4 w-4 mr-2" /> Add Service
+                        </Button>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>SMS Notifications</Label>
-                          <p className="text-sm text-gray-500">Receive text messages for booking reminders</p>
-                        </div>
-                        <Switch defaultChecked />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>Marketing Updates</Label>
-                          <p className="text-sm text-gray-500">Receive updates about new features and promotions</p>
-                        </div>
-                        <Switch />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Skills</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.skills.map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                            {skill}
+                            <button className="ml-1 hover:text-red-500">
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                        <Button variant="outline" size="sm">
+                          <Plus className="h-4 w-4 mr-2" /> Add Skill
+                        </Button>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Privacy Settings */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Privacy</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>Public Profile</Label>
-                          <p className="text-sm text-gray-500">Make your profile visible to everyone</p>
-                        </div>
-                        <Switch defaultChecked />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>Show Email</Label>
-                          <p className="text-sm text-gray-500">Display your email on your public profile</p>
-                        </div>
-                        <Switch />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label>Show Phone Number</Label>
-                          <p className="text-sm text-gray-500">Display your phone number on your public profile</p>
-                        </div>
-                        <Switch />
-                      </div>
-                    </div>
+                {/* Availability */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Availability</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.availability.map((time, index) => (
+                      <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                        {time}
+                        <button className="ml-1 hover:text-red-500">
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                    <Button variant="outline" size="sm">
+                      <Clock className="h-4 w-4 mr-2" /> Add Availability
+                    </Button>
                   </div>
+                </div>
 
-                  {/* Save Button */}
-                  <div className="flex justify-end space-x-4">
-                    <Button variant="outline">Cancel</Button>
-                    <Button>Save Changes</Button>
-                  </div>
+                <div className="flex justify-end space-x-4">
+                  <Button variant="outline">Cancel</Button>
+                  <Button>Save Changes</Button>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

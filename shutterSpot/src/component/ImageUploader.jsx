@@ -6,8 +6,8 @@ const ImageUploader = () => {
   const [uploadedUrls, setUploadedUrls] = useState([]);
 
   // Replace these with your actual Cloudinary credentials
-  const CLOUD_NAME = 'dk1sag6nc';
-  const UPLOAD_PRESET = 'shutterspot';
+  const CLOUD_NAME = import.meta.env.VITE_API_CLOUD_NAME;
+  const UPLOAD_PRESET = import.meta.env.VITE_APP_UPLOAD_PRESET;
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);

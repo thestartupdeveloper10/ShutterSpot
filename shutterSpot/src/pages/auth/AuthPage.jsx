@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,15 +6,86 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Facebook } from 'lucide-react';
+import { loginStart, loginSuccess, loginFailure, registerStart, registerFailure, registerSuccess } from '../../redux/features/user/userSlice';
+import { publicRequest } from '@/service/requestMethods';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 const AuthPage = () => {
+  // Common state
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  // Login state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  // Register state
+  const [username, setUsername] = useState('');
+  const [role, setRole] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-    // Add your form submission logic here
-    setTimeout(() => setIsLoading(false), 1000);
+    dispatch(loginStart());
+
+    try {
+      const response = await publicRequest.post('/auth/login', { 
+        email, 
+        password 
+      });
+      dispatch(loginSuccess(response.data));
+      response.data.role==='photographer' ? navigate(`/photographerProfile/${response.data.id}`) : navigate('/');
+      console.log(response.data);
+    } catch (err) {
+      dispatch(loginFailure());
+      setError(err.response?.data?.message || 'Invalid email or password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmitRegister = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    dispatch(registerStart());
+
+    // Validation
+    if (!username || !registerEmail || !registerPassword || !role) {
+      setError('All fields are required');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await publicRequest.post('/auth/register', {
+        username,
+        email: registerEmail,
+        role,
+        password: registerPassword
+      });
+
+      dispatch(registerSuccess(response.data));
+       // Redirect to login page after successful registration
+    } catch (err) {
+      dispatch(registerFailure());
+      setError(err.response?.data?.message || 'An error occurred during registration');
+      console.error('Registration error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = (provider) => {
+    console.log(`Social login with ${provider} clicked`);
+    // Implement social login logic here
   };
 
   // Custom SVG for X (formerly Twitter) logo
@@ -67,11 +138,24 @@ const AuthPage = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="name@example.com" required />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="name@example.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required />
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                  />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Login"}
@@ -87,17 +171,37 @@ const AuthPage = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="w-full"
+                    onClick={() => handleSocialLogin('facebook')}
+                  >
                     <Facebook className="h-5 w-5 text-blue-600" />
                   </Button>
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="w-full"
+                    onClick={() => handleSocialLogin('google')}
+                  >
                     <GoogleLogo />
                   </Button>
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="w-full"
+                    onClick={() => handleSocialLogin('twitter')}
+                  >
                     <XLogo />
                   </Button>
                 </div>
               </form>
+              {error && (
+                <div className="text-red-500 text-center mt-4">
+                  {error}
+                </div>
+              )}
             </CardContent>
           </TabsContent>
 
@@ -110,30 +214,51 @@ const AuthPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmitRegister} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
-                  <Input id="username" required />
+                  <Input 
+                    id="username" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Select required>
+                  <Select 
+                    value={role} 
+                    onValueChange={setRole}
+                    required
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="client">client</SelectItem>
-                      <SelectItem value="photographer">photographer</SelectItem>
+                      <SelectItem value="client">Client</SelectItem>
+                      <SelectItem value="photographer">Photographer</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="register-email">Email</Label>
-                  <Input id="register-email" type="email" required />
+                  <Input 
+                    id="register-email" 
+                    type="email" 
+                    value={registerEmail}
+                    onChange={(e) => setRegisterEmail(e.target.value)}
+                    required 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="register-password">Password</Label>
-                  <Input id="register-password" type="password" required />
+                  <Input 
+                    id="register-password" 
+                    type="password" 
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                    required 
+                  />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Creating account..." : "Create account"}
@@ -149,17 +274,37 @@ const AuthPage = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="w-full"
+                    onClick={() => handleSocialLogin('facebook')}
+                  >
                     <Facebook className="h-5 w-5 text-blue-600" />
                   </Button>
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="w-full"
+                    onClick={() => handleSocialLogin('google')}
+                  >
                     <GoogleLogo />
                   </Button>
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="w-full"
+                    onClick={() => handleSocialLogin('twitter')}
+                  >
                     <XLogo />
                   </Button>
                 </div>
               </form>
+              {error && (
+                <div className="text-red-500 text-center mt-4">
+                  {error}
+                </div>
+              )}
             </CardContent>
           </TabsContent>
         </Tabs>

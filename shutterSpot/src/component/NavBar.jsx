@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,20 +13,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
+import { Menu, Camera, Calendar, Home, BriefcaseBusiness, CircleUserRound, LogOut } from "lucide-react";
 import { selectCurrentUser } from '../redux/features/user/userSlice';
 import { logout } from '../redux/features/user/userSlice';
 
 const clientTabs = [
-  { text: "Home", link: "/" },
-  { text: "Find Photographer", link: "/photographers" },
-  { text: "Profile", link: "/clientProfile" },
+  { text: "Home", link: "/", icon: Home },
+  { text: "Find Photographer", link: "/photographers", icon: Camera },
+  { text: "Profile", link: "/clientProfile", icon: BriefcaseBusiness },
 ];
 
 const photographerTabs = [
-  { text: "Dashboard", link: "/photographer-dashboard" },
-  { text: "My Portfolio", link: "/my-portfolio" },
-  { text: "Bookings", link: "/bookings" },
+  { text: "Dashboard", link: "/photographer-dashboard", icon: Home },
+  { text: "Portfolio", link: "/my-portfolio", icon: BriefcaseBusiness },
+  { text: "Bookings", link: "/bookings", icon: Calendar },
 ];
 
 const NavBar = () => {
@@ -68,18 +68,47 @@ const NavBar = () => {
           <div className="hidden md:block">
             {user ? (
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Avatar>
-                    <AvatarImage src={user.profilePicture} />
-                    <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                <DropdownMenuTrigger className="focus:outline-none">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-10 w-10 ">
+                      <AvatarImage src={user.profile?.profilePic || user.profilePicture} className='object-cover' />
+                      <AvatarFallback>{user.profile?.name?.[0] || user.username?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="text-sm text-left hidden lg:block">
+                      <p className="font-medium">{user.profile?.name || user.username}</p>
+                      <p className="text-xs text-gray-300">{user.role}</p>
+                    </div>
+                  </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{user.profile?.name || user.username}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={() => navigate('/profile')}>Profile</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => navigate('/settings')}>Settings</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={handleLogout}>Logout</DropdownMenuItem>
+                  {user.role === 'photographer' && (
+                    <>
+                      <DropdownMenuItem onSelect={() => navigate('/my-portfolio')}>
+                        <BriefcaseBusiness className="mr-2 h-4 w-4" />
+                        <span>My Portfolio</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => navigate('/bookings')}>
+                        <Calendar className="mr-2 h-4 w-4" />
+                        <span>Bookings</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuItem onSelect={() => navigate(`/clientProfile/${user.id}`)}>
+                    <CircleUserRound className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600" onSelect={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -88,6 +117,7 @@ const NavBar = () => {
               </Link>
             )}
           </div>
+          
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -122,12 +152,14 @@ const NavBar = () => {
               <div className="flex items-center px-5">
                 <div className="flex-shrink-0">
                   <Avatar>
-                    <AvatarImage src={user.profilePicture} />
-                    <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={user.profile?.profilePic || user.profilePicture}  className='object-cover' />
+                    <AvatarFallback>{user.profile?.name?.[0] || user.username?.[0]}</AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium leading-none text-white">{user.username}</div>
+                  <div className="text-base font-medium leading-none text-white">
+                    {user.profile?.name || user.username}
+                  </div>
                   <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
                 </div>
               </div>
@@ -144,28 +176,43 @@ const NavBar = () => {
             )}
             {user && (
               <div className="mt-3 px-2 space-y-1">
+                {user.role === 'photographer' && (
+                  <>
+                    <Link
+                      to="/my-portfolio"
+                      className="flex items-center px-3 py-2 rounded-md text-base font-medium text-white hover:text-white hover:bg-gray-700"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <BriefcaseBusiness className="mr-2 h-4 w-4" />
+                      <span>My Portfolio</span>
+                    </Link>
+                    <Link
+                      to="/bookings"
+                      className="flex items-center px-3 py-2 rounded-md text-base font-medium text-white hover:text-white hover:bg-gray-700"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      <span>Bookings</span>
+                    </Link>
+                  </>
+                )}
                 <Link
-                  to="/profile"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-white hover:bg-gray-700"
+                  to={`/clientProfile/${user.id}`}
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-white hover:text-white hover:bg-gray-700"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Profile
-                </Link>
-                <Link
-                  to="/settings"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-white hover:bg-gray-700"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Settings
+                  <CircleUserRound className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
                 </Link>
                 <button
                   onClick={() => {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:text-white hover:bg-gray-700"
+                  className="flex items-center w-full px-3 py-2 rounded-md text-base font-medium text-red-500 hover:text-red-400 hover:bg-gray-700"
                 >
-                  Logout
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
                 </button>
               </div>
             )}
