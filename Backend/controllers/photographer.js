@@ -11,69 +11,87 @@ const photographerRouter = express.Router();
 
 // CREATE PHOTOGRAPHER PROFILE
 photographerRouter.post("/", verifyToken, async (req, res, next) => {
-    try {
-      const { id: userId, role } = req.user;
-  
-      // Check if the user has a photographer role
-      if (role !== 'photographer') {
-        return next(createError(403, "Only photographers can create a profile"));
-      }
-  
-      // Check if the photographer profile already exists
-      const existingProfile = await prisma.photographer.findUnique({
-        where: { userId },
-      });
-      if (existingProfile) {
-        return next(createError(400, "Photographer profile already exists"));
-      }
-  
-      // Create the photographer profile
-      const {
+  try {
+    const { id: userId, role } = req.user;
+
+    // Ensure only photographers can create a profile
+    if (role !== "photographer") {
+      return next(createError(403, "Only photographers can create a profile"));
+    }
+
+    // Prevent duplicate profiles
+    const existingProfile = await prisma.user.findUnique({
+      where: { userId },
+    });
+    console.log('userId', existingProfile);
+    if (existingProfile) {
+      return next(createError(400, "Photographer profile already exists"));
+    }
+
+    // Destructure body fields
+    const {
+      name,
+      about,
+      portfolio,
+      phone,
+      skills = [],
+      cameras = [],
+      lenses = [],
+      experience,
+      education,
+      languages = [],
+      availability = [],
+      experienceYears,
+      location,
+      services = [],
+      priceRange,
+      photos = [],
+      profilePic
+    } = req.body;
+
+    // Parse comma-separated strings into arrays if necessary
+    const parseToArray = (field) =>
+      typeof field === "string" ? field.split(",").map((item) => item.trim()) : field;
+
+    // Ensure fields are arrays
+    const formattedSkills = parseToArray(skills);
+    const formattedCameras = parseToArray(cameras);
+    const formattedLenses = parseToArray(lenses);
+    const formattedLanguages = parseToArray(languages);
+    const formattedAvailability = parseToArray(availability);
+    const formattedServices = parseToArray(services);
+
+    // Create the photographer profile
+    const newPhotographer = await prisma.photographer.create({
+      data: {
+        userId,
         name,
         about,
         portfolio,
         phone,
-        skills,
-        cameras,
-        lenses,
+        skills: formattedSkills,
+        cameras: formattedCameras,
+        lenses: formattedLenses,
         experience,
         education,
-        languages,
-        availability,
+        languages: formattedLanguages,
+        availability: formattedAvailability,
         experienceYears,
         location,
-        services,
+        services: formattedServices,
         priceRange,
         photos,
-      } = req.body;
-  
-      const newPhotographer = await prisma.photographer.create({
-        data: {
-          userId,
-          name,
-          about,
-          portfolio,
-          phone,
-          skills,
-          cameras,
-          lenses,
-          experience,
-          education,
-          languages,
-          availability,
-          experienceYears,
-          location,
-          services,
-          priceRange,
-          photos,
-        },
-      });
-  
-      res.status(201).json(newPhotographer);
-    } catch (err) {
-      next(createError(500, "Error creating photographer profile"));
-    }
-  });
+        profilePic
+      },
+    });
+
+    res.status(201).json(newPhotographer);
+  } catch (err) {
+    console.error("Prisma error:", err);
+    next(createError(500, "Error creating photographer profile"));
+  }
+});
+
 
 // UPDATE
 photographerRouter.put("/:id", verifyToken, async (req, res, next) => {

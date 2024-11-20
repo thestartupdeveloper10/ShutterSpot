@@ -18,6 +18,7 @@ const getCurrentUserToken = () => {
 // Get the token
 const TOKEN = getCurrentUserToken();
 
+console.log('token', TOKEN);
 
 
 export const publicRequest = axios.create({
@@ -38,4 +39,9 @@ userRequest.interceptors.request.use((config) => {
   return config;
 }, (error) => {
   return Promise.reject(error);
+});
+
+userRequest.interceptors.request.use((config) => {
+  console.log("Headers before request:", config.headers);
+  return config;
 });
