@@ -5,22 +5,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Facebook } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { CheckCircle2, Facebook } from 'lucide-react';
 import { loginStart, loginSuccess, loginFailure, registerStart, registerFailure, registerSuccess } from '../../redux/features/user/userSlice';
 import { publicRequest } from '@/service/requestMethods';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 const AuthPage = () => {
-  // Common state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   
-  // Login state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  // Register state
   const [username, setUsername] = useState('');
   const [role, setRole] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
@@ -42,7 +41,6 @@ const AuthPage = () => {
       });
       dispatch(loginSuccess(response.data));
       response.data.role==='photographer' ? navigate(`/photographerProfile/${response.data.id}`) : navigate('/');
-      console.log(response.data);
     } catch (err) {
       dispatch(loginFailure());
       setError(err.response?.data?.message || 'Invalid email or password');
@@ -57,7 +55,6 @@ const AuthPage = () => {
     setIsLoading(true);
     dispatch(registerStart());
 
-    // Validation
     if (!username || !registerEmail || !registerPassword || !role) {
       setError('All fields are required');
       setIsLoading(false);
@@ -73,11 +70,10 @@ const AuthPage = () => {
       });
 
       dispatch(registerSuccess(response.data));
-       // Redirect to login page after successful registration
+      setRegistrationSuccess(true);
     } catch (err) {
       dispatch(registerFailure());
       setError(err.response?.data?.message || 'An error occurred during registration');
-      console.error('Registration error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -88,14 +84,13 @@ const AuthPage = () => {
     // Implement social login logic here
   };
 
-  // Custom SVG for X (formerly Twitter) logo
+  // Custom SVG logos
   const XLogo = () => (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );
 
-  // Custom SVG for Google logo
   const GoogleLogo = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
       <path
@@ -117,6 +112,31 @@ const AuthPage = () => {
     </svg>
   );
 
+  const SuccessModal = () => (
+    <Dialog open={registrationSuccess} onOpenChange={setRegistrationSuccess}>
+      <DialogContent className="max-w-sm text-center">
+        <div className="flex flex-col items-center space-y-4 p-4">
+          <CheckCircle2 className="h-16 w-16 text-green-500" strokeWidth={1.5} />
+          <div>
+            <DialogTitle className="text-xl mb-2">Registration Successful</DialogTitle>
+            <DialogDescription>
+              Your account has been created. You can now log in.
+            </DialogDescription>
+          </div>
+          <Button 
+            onClick={() => {
+              setRegistrationSuccess(false);
+              document.querySelector('[data-value="login"]')?.click();
+            }} 
+            className="w-full"
+          >
+            Go to Login
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
@@ -126,7 +146,7 @@ const AuthPage = () => {
             <TabsTrigger value="register">Register</TabsTrigger>
           </TabsList>
 
-          {/* Login Form */}
+          {/* Login Form Content */}
           <TabsContent value="login">
             <CardHeader>
               <CardTitle>Login</CardTitle>
@@ -141,7 +161,6 @@ const AuthPage = () => {
                   <Input 
                     id="email" 
                     type="email" 
-                    placeholder="name@example.com" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)} 
                     required 
@@ -205,7 +224,7 @@ const AuthPage = () => {
             </CardContent>
           </TabsContent>
 
-          {/* Register Form */}
+          {/* Register Form Content */}
           <TabsContent value="register">
             <CardHeader>
               <CardTitle>Create an account</CardTitle>
@@ -308,6 +327,8 @@ const AuthPage = () => {
             </CardContent>
           </TabsContent>
         </Tabs>
+
+        <SuccessModal />
       </Card>
     </div>
   );

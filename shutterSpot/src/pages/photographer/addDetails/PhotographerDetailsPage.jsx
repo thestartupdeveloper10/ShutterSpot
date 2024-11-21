@@ -161,9 +161,8 @@ const PhotographerDetailsPage = () => {
       const response = await userRequest.post('photographers', formDataToSubmit);
 
       if (response.status === 201) {
-        console.log(`/photographerProfile/${user.id}`)
-        console.log('return data',response.data)
-        navigate(`/photographerProfile/${user.id}`);
+        console.log('return data',response.data.userId)
+        navigate(`/photographerProfile/${response.data.userId}`);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -297,7 +296,7 @@ const PhotographerDetailsPage = () => {
               <div className="space-y-2">
                 <Label>Skills</Label>
                 <div className="flex flex-wrap gap-2">
-                  {['Photography', 'Videography','Event Coverage','Concert Photography','Streets','Wildlife','Travel', 'Post-Processing', 'Studio Lighting', 'Drone Photography'].map(skill => (
+                  {['Photography','Wedding Photography', 'Videography','Food Photography','Product Photography','Styling','Event Coverage','Concert Photography','Streets','Wildlife','Travel', 'Post-Processing', 'Studio Lighting', 'Drone Photography'].map(skill => (
                     <div 
                       key={skill} 
                       className={`px-3 py-1 rounded-full text-sm cursor-pointer ${
@@ -404,10 +403,15 @@ const PhotographerDetailsPage = () => {
                     <SelectValue placeholder="Select price range" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="budget">Ksh 100-200</SelectItem>
-                    <SelectItem value="standard">Ksh 200-300</SelectItem>
-                    <SelectItem value="premium">Ksh 300-500</SelectItem>
-                    <SelectItem value="luxury">Ksh 500+</SelectItem>
+                    <SelectItem value="Ksh 100/photo">Ksh 100/photo</SelectItem>
+                    <SelectItem value="Ksh 150/photo">Ksh 150/photo</SelectItem>
+                    <SelectItem value="Ksh 200/photo">Ksh 200/photo</SelectItem>
+                    <SelectItem value="Ksh 500/photo">Ksh 500/photo</SelectItem>
+                    <SelectItem value="Ksh 1000/hr">Ksh 1000/hr</SelectItem>
+                    <SelectItem value="Ksh 2000/hr">Ksh 2000/hr</SelectItem>
+                    <SelectItem value="Ksh 3000/hr">Ksh 3000/hr</SelectItem>
+                    <SelectItem value="Ksh 5000/hr">Ksh 5000/hr</SelectItem>
+                    <SelectItem value="Ksh 5000+/hr">Ksh 5000+/hr</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -14,8 +14,9 @@ import { Link } from 'react-router-dom';
 
 // Helper function to extract price range values
 const extractPriceRange = (priceString) => {
+  // For Kenyan Shilling format
   const numbers = priceString.match(/\d+/g);
-  return numbers ? [parseInt(numbers[0]), parseInt(numbers[1])] : [0, 3000]; // Default range if parsing fails
+  return numbers ? [parseInt(numbers[0]), parseInt(numbers[1]) || parseInt(numbers[0]) + 1000] : [0, 5000];
 };
 
 // Helper function to get unique values from array of objects
@@ -213,7 +214,9 @@ const PhotographerCard = ({ photographer }) => {
       {/* Quick Info Overlay */}
       <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         {photographer.cameras && photographer.cameras.length > 0 && (
-          <div className="bg-black/70 text-white rounded-full p-2" title="Camera Equipment">
+          <div className="bg-black/70 text-white rounded-full p-2" 
+          title={`Cameras: ${photographer.cameras.join(', ')}`}
+          >
             <svg 
               className="w-4 h-4" 
               fill="none" 

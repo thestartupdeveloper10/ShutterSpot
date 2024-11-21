@@ -17,7 +17,8 @@ const PhotographerCard = ({ photographer }) => {
   const portfolioImages = photographer.photos.slice(0, 2);
 
   // Extract starting price from price range (e.g., "$500 - $3000" -> 500)
-  const startingPrice = photographer.priceRange.match(/\$(\d+)/)?.[1] || '0';
+  // const startingPrice = photographer.priceRange.match(/\$(\d+)/)?.[1] || '0';
+  const startingPrice = photographer.priceRange
 
   return (
     <Card className="w-full">
@@ -57,7 +58,6 @@ const PhotographerCard = ({ photographer }) => {
                 </div>
                 <div className="flex flex-col gap-2 items-end">
                   <div className="flex items-center">
-                    <DollarSign className="h-4 w-4" />
                     <p className='text-xl font-semibold'>{startingPrice}</p>
                   </div>
                   <p className='text-sm text-gray-600 flex items-center'>

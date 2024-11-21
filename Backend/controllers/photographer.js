@@ -20,7 +20,7 @@ photographerRouter.post("/", verifyToken, async (req, res, next) => {
     }
 
     // Prevent duplicate profiles
-    const existingProfile = await prisma.user.findUnique({
+    const existingProfile = await prisma.photographer.findUnique({
       where: { userId },
     });
     console.log('userId', existingProfile);
