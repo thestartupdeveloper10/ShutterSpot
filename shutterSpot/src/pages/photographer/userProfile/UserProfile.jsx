@@ -1,11 +1,5 @@
-import React, { useState } from 'react';
-import {
-  User, Mail, Phone, MapPin, Camera, Settings, 
-  Image as ImageIcon, Calendar, Clock, Heart,
-  Star, Edit, Trash2, Grid, List, Share2,
-  Instagram, Facebook, Twitter, Link as LinkIcon,
-  Plus // Added missing Plus import
-} from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { User, Mail, Phone, MapPin, Camera, Settings, ImageIcon, Calendar, Clock, Heart, Star, Edit, Trash2, Grid, List, Share2, Instagram, Facebook, Twitter, LinkIcon, Plus, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
@@ -13,6 +7,11 @@ import {
 import {
   Tabs, TabsContent, TabsList, TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Dialog, DialogContent, DialogDescription,
+  DialogHeader, DialogTitle, DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -23,6 +22,52 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import NavBar from '@/component/NavBar';
 import Footer from '@/component/Footer';
+import { useNavigate } from 'react-router-dom';
+import { userRequest } from '@/service/requestMethods';
+
+// AddItemDialog Component
+const AddItemDialog = ({ isOpen, onClose, onAdd, title, description, inputLabel }) => {
+  const [value, setValue] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (value.trim()) {
+      onAdd(value.trim());
+      setValue('');
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="item">{inputLabel}</Label>
+              <Input
+                id="item"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder={`Enter ${inputLabel.toLowerCase()}`}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">Add</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 // StatCard Component
 const StatCard = ({ title, value, icon: Icon, description }) => (
@@ -124,46 +169,21 @@ const PortfolioGrid = ({ items, viewMode }) => (
             alt={`Portfolio item ${index + 1}`}
             className="w-full h-48 object-cover"
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-          >
-            <Heart className="h-4 w-4" />
-          </Button>
         </div>
-        <CardContent className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-          <div className="flex items-center justify-between">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Edit className="mr-2 h-4 w-4" /> Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Share2 className="mr-2 h-4 w-4" /> Share
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </CardContent>
       </Card>
     ))}
   </div>
 );
 
 // Main UserProfile Component
-const UserProfile = ({ userData }) => {
+const UserProfile = ({ userData: initialUserData }) => {
+  const [userData, setUserData] = useState(initialUserData);
   const [viewMode, setViewMode] = useState('grid');
+  const [activeDialog, setActiveDialog] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const profile = userData.profile;
+  console.log(profile)
+  const router = useNavigate()
 
   const stats = {
     totalBookings: userData.bookings.length,
@@ -171,6 +191,242 @@ const UserProfile = ({ userData }) => {
     experienceYears: profile.experienceYears,
     responseRate: 98
   };
+
+  const handleAdd = (category) => (newItem) => {
+    setUserData(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        [category]: [...prev.profile[category], newItem]
+      }
+    }));
+  };
+
+  const handleRemove = (category, index) => {
+    setUserData(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        [category]: prev.profile[category].filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const dialogConfigs = {
+    cameras: {
+      title: "Add Camera",
+      description: "Add a new camera to your equipment list",
+      inputLabel: "Camera Model"
+    },
+    lenses: {
+      title: "Add Lens",
+      description: "Add a new lens to your equipment list",
+      inputLabel: "Lens Model"
+    },
+    services: {
+      title: "Add Service",
+      description: "Add a new service to your offerings",
+      inputLabel: "Service Name"
+    },
+    skills: {
+      title: "Add Skill",
+      description: "Add a new skill to your profile",
+      inputLabel: "Skill Name"
+    },
+    languages: {
+      title: "Add Language",
+      description: "Add a new language you speak",
+      inputLabel: "Language"
+    },
+    availability: {
+      title: "Add Availability",
+      description: "Add new availability time slot",
+      inputLabel: "Time Slot"
+    }
+  };
+
+  const handleSubmit = useCallback(async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await userRequest.put(`photographers/${profile.id}`,userData)
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const updatedData = await response.json();
+      setUserData(updatedData);
+      alert('Profile updated successfully!');
+      router.push('/profile'); // Redirect to profile page after successful update
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [userData, router]);
+
+  // Equipment Section
+  const renderEquipmentSection = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Equipment</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Cameras</Label>
+          <div className="flex flex-wrap gap-2">
+            {userData.profile.cameras.map((camera, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                {camera}
+                <button 
+                  className="ml-1 hover:text-red-500"
+                  onClick={() => handleRemove('cameras', index)}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setActiveDialog('cameras')}
+            >
+              <Camera className="h-4 w-4 mr-2" /> Add Camera
+            </Button>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Lenses</Label>
+          <div className="flex flex-wrap gap-2">
+            {userData.profile.lenses.map((lens, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                {lens}
+                <button 
+                  className="ml-1 hover:text-red-500"
+                  onClick={() => handleRemove('lenses', index)}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setActiveDialog('lenses')}
+            >
+              <Camera className="h-4 w-4 mr-2" /> Add Lens
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Services & Skills Section
+  const renderServicesSection = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Services & Skills</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Services Offered</Label>
+          <div className="flex flex-wrap gap-2">
+            {userData.profile.services.map((service, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                {service}
+                <button 
+                  className="ml-1 hover:text-red-500"
+                  onClick={() => handleRemove('services', index)}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setActiveDialog('services')}
+            >
+              <Plus className="h-4 w-4 mr-2" /> Add Service
+            </Button>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Skills</Label>
+          <div className="flex flex-wrap gap-2">
+            {userData.profile.skills.map((skill, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                {skill}
+                <button 
+                  className="ml-1 hover:text-red-500"
+                  onClick={() => handleRemove('skills', index)}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setActiveDialog('skills')}
+            >
+              <Plus className="h-4 w-4 mr-2" /> Add Skill
+            </Button>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Languages</Label>
+          <div className="flex flex-wrap gap-2">
+            {userData.profile.languages.map((language, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center gap-2">
+                {language}
+                <button 
+                  className="ml-1 hover:text-red-500"
+                  onClick={() => handleRemove('languages', index)}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setActiveDialog('languages')}
+            >
+              <Plus className="h-4 w-4 mr-2" /> Add Language
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Availability Section
+  const renderAvailabilitySection = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Availability</h3>
+      <div className="flex flex-wrap gap-2">
+        {userData.profile.availability.map((time, index) => (
+          <Badge key={index} variant="secondary" className="flex items-center gap-2">
+            {time}
+            <button 
+              className="ml-1 hover:text-red-500"
+              onClick={() => handleRemove('availability', index)}
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        ))}
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setActiveDialog('availability')}
+        >
+          <Clock className="h-4 w-4 mr-2" /> Add Availability
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -215,7 +471,6 @@ const UserProfile = ({ userData }) => {
                       </div>
                     </div>
                   </div>
-                  <Button>Edit Profile</Button>
                 </div>
                 <div className="mt-4">
                   <h3 className="font-semibold mb-2">About</h3>
@@ -330,183 +585,157 @@ const UserProfile = ({ userData }) => {
                   Manage your account settings and preferences
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-8">
-                {/* Personal Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Personal Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input id="name" defaultValue={profile.name} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" defaultValue={userData.email} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input id="phone" type="tel" defaultValue={profile.phone} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="location">Location</Label>
-                      <Input id="location" defaultValue={profile.location} />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="about">About</Label>
-                    <textarea
-                      id="about"
-                      className="w-full min-h-[100px] px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      defaultValue={profile.about}
-                    />
-                  </div>
-                </div>
-
-                {/* Professional Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Professional Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="experience">Years of Experience</Label>
-                      <Input 
-                        id="experience" 
-                        type="number" 
-                        defaultValue={profile.experienceYears} 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="education">Education</Label>
-                      <Input 
-                        id="education" 
-                        defaultValue={profile.education} 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="portfolio">Portfolio URL</Label>
-                      <Input 
-                        id="portfolio" 
-                        type="url" 
-                        defaultValue={profile.portfolio} 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="priceRange">Price Range</Label>
-                      <Input 
-                        id="priceRange" 
-                        defaultValue={profile.priceRange} 
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Equipment */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Equipment</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Cameras</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {profile.cameras.map((camera, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
-                            {camera}
-                            <button className="ml-1 hover:text-red-500">
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                        <Button variant="outline" size="sm">
-                          <Camera className="h-4 w-4 mr-2" /> Add Camera
-                        </Button>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  {/* Personal Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Personal Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <Input 
+                          id="name" 
+                          value={profile.name} 
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            profile: { ...prev.profile, name: e.target.value }
+                          }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input 
+                          id="email" 
+                          type="email" 
+                          value={userData.email}
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            email: e.target.value
+                          }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input 
+                          id="phone" 
+                          type="tel" 
+                          value={profile.phone}
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            profile: { ...prev.profile, phone: e.target.value }
+                          }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Location</Label>
+                        <Input 
+                          id="location" 
+                          value={profile.location}
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            profile: { ...prev.profile, location: e.target.value }
+                          }))}
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Lenses</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {profile.lenses.map((lens, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
-                            {lens}
-                            <button className="ml-1 hover:text-red-500">
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                        <Button variant="outline" size="sm">
-                          <Camera className="h-4 w-4 mr-2" /> Add Lens
-                        </Button>
+                      <Label htmlFor="about">About</Label>
+                      <textarea
+                        id="about"
+                        className="w-full min-h-[100px] px-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={profile.about}
+                        onChange={(e) => setUserData(prev => ({
+                          ...prev,
+                          profile: { ...prev.profile, about: e.target.value }
+                        }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Professional Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Professional Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="experience">Years of Experience</Label>
+                        <Input 
+                          id="experience" 
+                          type="number" 
+                          value={profile.experienceYears}
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            profile: { ...prev.profile, experienceYears: parseInt(e.target.value) }
+                          }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="education">Education</Label>
+                        <Input 
+                          id="education" 
+                          value={profile.education}
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            profile: { ...prev.profile, education: e.target.value }
+                          }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="portfolio">Portfolio URL</Label>
+                        <Input 
+                          id="portfolio" 
+                          type="url" 
+                          value={profile.portfolio}
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            profile: { ...prev.profile, portfolio: e.target.value }
+                          }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="priceRange">Price Range</Label>
+                        <Input 
+                          id="priceRange" 
+                          value={profile.priceRange}
+                          onChange={(e) => setUserData(prev => ({
+                            ...prev,
+                            profile: { ...prev.profile, priceRange: e.target.value }
+                          }))}
+                        />
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Services & Skills */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Services & Skills</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Services Offered</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {profile.services.map((service, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
-                            {service}
-                            <button className="ml-1 hover:text-red-500">
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                        <Button variant="outline" size="sm">
-                          <Plus className="h-4 w-4 mr-2" /> Add Service
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Skills</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {profile.skills.map((skill, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center gap-2">
-                            {skill}
-                            <button className="ml-1 hover:text-red-500">
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                        <Button variant="outline" size="sm">
-                          <Plus className="h-4 w-4 mr-2" /> Add Skill
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  {renderEquipmentSection()}
+                  {renderServicesSection()}
+                  {renderAvailabilitySection()}
 
-                {/* Availability */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Availability</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {profile.availability.map((time, index) => (
-                      <Badge key={index} variant="secondary" className="flex items-center gap-2">
-                        {time}
-                        <button className="ml-1 hover:text-red-500">
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                    <Button variant="outline" size="sm">
-                      <Clock className="h-4 w-4 mr-2" /> Add Availability
+                  <div className="flex justify-end space-x-4">
+                    <Button type="button" variant="outline" onClick={() => router.push('/profile')}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? 'Saving...' : 'Save Changes'}
                     </Button>
                   </div>
-                </div>
-
-                <div className="flex justify-end space-x-4">
-                  <Button variant="outline">Cancel</Button>
-                  <Button>Save Changes</Button>
-                </div>
+                </form>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
+      {/* Add Item Dialog */}
+      {activeDialog && (
+        <AddItemDialog
+          isOpen={!!activeDialog}
+          onClose={() => setActiveDialog(null)}
+          onAdd={handleAdd(activeDialog)}
+          {...dialogConfigs[activeDialog]}
+        />
+      )}
       <Footer />
     </div>
   );
 };
 
 export default UserProfile;
+

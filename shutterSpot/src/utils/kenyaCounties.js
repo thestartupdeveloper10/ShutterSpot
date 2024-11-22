@@ -189,6 +189,10 @@ const kenyaCounties = [
     {
         "_id": "64299a06f3535c774b4d275d",
         "name": "Nairobi City"
+    },
+    {
+        "_id": "64238a06f3535c774b4d275d",
+        "name": "Eldoret"
     }
 ];
 

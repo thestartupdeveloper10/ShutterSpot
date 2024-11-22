@@ -115,6 +115,7 @@ photographerRouter.put("/:id", verifyToken, async (req, res, next) => {
 
     res.status(200).json(updatedPhotographer);
   } catch (err) {
+    console.log('print error', err);
     next(createError(500, 'Error updating photographer'));
   }
 });
