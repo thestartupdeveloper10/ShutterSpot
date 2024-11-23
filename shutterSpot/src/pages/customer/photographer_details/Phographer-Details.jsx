@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Camera, Aperture, Globe, Users, Smile, Camera as CameraIcon, Shield, ArrowUp, Calendar, Mail, Phone, MessageSquare } from 'lucide-react';
+import { Calendar as CalendarIcon, Camera, Aperture, Globe, Users, Smile, Camera as CameraIcon, Shield, ArrowUp, Mail, Phone, MessageSquare } from 'lucide-react';
+import { Calendar } from "@/components/ui/calendar";
+import { format } from 'date-fns';
 import NavBar from '@/component/NavBar';
 import Footer from '@/component/Footer';
 import { Button } from "@/components/ui/button";
@@ -13,7 +15,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select,SelectGroup, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Card,
   CardContent,
@@ -27,17 +30,48 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { publicRequest } from '@/service/requestMethods';
+import { useSelector } from 'react-redux';
 
-const BookingForm = ({ photographerName, photographerPhone }) => {
+const BookingForm = ({ photographerName, photographerId }) => {
+  const user = useSelector(state => state.user);
+  const [date, setDate] = useState(null);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    date: '',
-    message: ''
+    photographerId: photographerId,
+    clientId: user?.currentUser?.id || '',
+    location: '',
+    duration: '',
+    totalPrice: '',
+    message: '',
+    status: 'pending'
   });
 
-  const handleChange = (e) => {
+  // Generate time options from 8 AM to 5 PM
+  const timeOptions = [];
+  for (let i = 8; i <= 17; i++) {
+    const hour = i.toString().padStart(2, '0');
+    timeOptions.push(`${hour}:00`);
+    timeOptions.push(`${hour}:30`);
+  }
+
+  useEffect(() => {
+    if (startTime && endTime) {
+      const start = new Date(`2000/01/01 ${startTime}`);
+      const end = new Date(`2000/01/01 ${endTime}`);
+      const durationHours = (end - start) / (1000 * 60 * 60);
+      
+      if (durationHours > 0) {
+        setFormData(prev => ({
+          ...prev,
+          duration: durationHours.toString()
+        }));
+      }
+    }
+  }, [startTime, endTime]);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -45,77 +79,182 @@ const BookingForm = ({ photographerName, photographerPhone }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    const bookingData = {
+      ...formData,
+      date,
+      startTime,
+      endTime,
+    };
+    
+    try {
+      const response = await publicRequest.post('/bookings', bookingData);
+      console.log('Booking created:', response.data);
+    } catch (error) {
+      console.error('Error creating booking:', error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Full Name
-        </label>
-        <Input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Enter your name"
-        />
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto p-4 md:p-6 lg:p-8 space-y-6 bg-white rounded-lg shadow-sm">
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="space-y-4 md:col-span-2">
+          <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Full Name</label>
+              <Input
+                value={user?.currentUser?.username || ''}
+                disabled
+                className="mt-1"
+              />
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Email</label>
+                <Input
+                  type="email"
+                  value={user?.currentUser?.email || ''}
+                  disabled
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                <Input
+                  type="tel"
+                  value={user?.currentUser?.profile?.phone || ''}
+                  disabled
+                  className="mt-1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 md:col-span-2">
+          <h3 className="text-lg font-semibold text-gray-900">Booking Details</h3>
+          
+          <div>
+            <label className="text-sm font-medium text-gray-700">Date</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full mt-1 justify-start text-left">
+                  {date ? format(date, 'PPP') : (
+                    <span className="text-gray-500">Pick a date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                  disabled={(date) => date < new Date()}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Start Time</label>
+              <Select 
+                value={startTime} 
+                onValueChange={(value) => setStartTime(value)}
+              >
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="Select start time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {timeOptions.map((time) => (
+                      <SelectItem 
+                        key={time} 
+                        value={time}
+                        disabled={endTime && time >= endTime}
+                      >
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700">End Time</label>
+              <Select 
+                value={endTime} 
+                onValueChange={(value) => setEndTime(value)}
+              >
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="Select end time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {timeOptions.map((time) => (
+                      <SelectItem 
+                        key={time} 
+                        value={time}
+                        disabled={startTime && time <= startTime}
+                      >
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Duration (hours)</label>
+              <Input
+                name="duration"
+                value={formData.duration}
+                disabled
+                className="mt-1 bg-gray-50"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700">Total Price</label>
+              <Input
+                name="totalPrice"
+                type="number"
+                value={formData.totalPrice}
+                onChange={handleInputChange}
+                placeholder="Total price"
+                required
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">Location</label>
+            <Input
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              placeholder="Event location"
+              required
+              className="mt-1"
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Email
-        </label>
-        <Input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="your@email.com"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Phone Number
-        </label>
-        <Input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          placeholder="Your phone number"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Preferred Date
-        </label>
-        <Input
-          type="date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Message
-        </label>
-        <Textarea
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          placeholder="Tell us about your event or project..."
-        />
-      </div>
-
-      <Button type="submit" className="w-full">
-        Book Now
+      <Button type="submit" className="w-full mt-8">
+        Confirm Booking
       </Button>
     </form>
   );

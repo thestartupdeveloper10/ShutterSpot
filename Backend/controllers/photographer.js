@@ -164,6 +164,49 @@ photographerRouter.get("/", async (req, res, next) => {
   }
 });
 
+// GET PHOTOGRAPHERS BY CATEGORY
+photographerRouter.get("/category/:category", async (req, res, next) => {
+  try {
+    const { category } = req.params;
+    
+    // Map URL-friendly categories to database categories
+    const categoryMapping = {
+      'wedding-photography': ['Wedding Photography', 'Beach Weddings', 'Weddings'],
+      'studio-photoshoots': ['Studio Photoshoots', 'Portrait Sessions'],
+      'fashion-photography': ['Fashion Photography', 'Lifestyle Shoots'],
+      'portrait-photography': ['Portrait Photography', 'Family Portraits', 'Corporate Headshots'],
+      'food-photography': ['Food Photography', 'Product Photography'],
+      'travel-photography': ['Travel Photography', 'Tourism Photography'],
+      'event-photography': ['Event Photography', 'Corporate Events', 'Concert Photography']
+    };
+
+    const searchCategories = categoryMapping[category] || [category.split('-').join(' ')];
+
+    const photographers = await prisma.photographer.findMany({
+      where: {
+        services: {
+          hasSome: searchCategories
+        }
+      }
+    });
+
+    if (!photographers) {
+      return res.status(200).json([]);
+    }
+
+    // Remove sensitive information
+    const sanitizedPhotographers = photographers.map(photographer => {
+      const { password, ...photographerData } = photographer;
+      return photographerData;
+    });
+
+    res.status(200).json(sanitizedPhotographers);
+  } catch (error) {
+    console.error('Error fetching photographers by category:', error);
+    next(createError(500, 'Error fetching photographers'));
+  }
+});
+
 // GET USER STATS
 
 

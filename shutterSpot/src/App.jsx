@@ -8,6 +8,8 @@ import PhotographerDashboard from './pages/photographer/photographer_dashboard/P
 import PhotographerDetailsPage from './pages/photographer/addDetails/PhotographerDetailsPage';
 import UserProfile from './pages/photographer/userProfile/UserProfile';
 import CustomerProfile from './pages/customer/customerProfile/CustomerProfile';
+import CategoryPhotographers from './pages/customer/CategoryPhotographers';
+import ServicesPage from './pages/services/ServicesPage';
 import { useSelector } from 'react-redux';
 
 function App() {
@@ -25,8 +27,10 @@ function App() {
             <Route path="/photographer/:id" element={<Photographer_Details />} />
             <Route path="/book" element={<Book />} />
             <Route path="/photographers" element={<PhotographersListingPage />} />
+            <Route path="/services" element={<ServicesPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/photographer-dashboard" element={<PhotographerDashboard />} />
+            <Route path="/photographers/category/:category" element={<CategoryPhotographers />} />
 
             {/* Conditional Routes */}
             {isPhotographer && !currentUser?.profile && (
