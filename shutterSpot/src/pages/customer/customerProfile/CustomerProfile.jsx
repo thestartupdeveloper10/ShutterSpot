@@ -50,8 +50,7 @@ const CustomerProfile = ({ userData }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <NavBar />
+  
       <div className="py-28 px-6 md:mx-24">
         {/* Profile Section */}
         <Card>
@@ -227,8 +226,8 @@ const CustomerProfile = ({ userData }) => {
           </TabsContent>
         </Tabs>
       </div>
-      <Footer />
-    </div>
+
+
   );
 };
 

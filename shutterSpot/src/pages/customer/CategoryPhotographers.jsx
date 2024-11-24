@@ -95,8 +95,7 @@ const CategoryPhotographers = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <NavBar/>
+    
     <div className="py-28 md:mx-24 mx-5 bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="max-w-7xl mx-auto">
         <motion.div 
@@ -224,8 +223,7 @@ const CategoryPhotographers = () => {
         </motion.div>
       </div>
     </div>
-    <Footer/>
-    </div>
+   
   );
 };
 

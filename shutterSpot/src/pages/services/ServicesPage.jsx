@@ -143,7 +143,7 @@ const ServicesPage = () => {
 
   return (
     <div className="min-h-screen">
-      <NavBar />
+    
       
       {/* Hero Section */}
       <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">

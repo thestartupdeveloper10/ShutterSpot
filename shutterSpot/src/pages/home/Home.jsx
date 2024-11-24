@@ -1,14 +1,11 @@
 // import videoBG from '../assets/videos/video (1080p) (1).mp4'
 
-import heroImg from '../../assets/imgs/hero/hero-imge.jpg'
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
-import Footer from '../../component/Footer';
 import Instructions from '../../component/Instructions';
 import PhotographerCarousel from '../../component/Swiper';
 import Capture from '../../component/Moments';
 import Services from '../../component/Services';
-import NavBar from '../../component/NavBar';
 import InfoCardGrid from './InfoCard';
 
 
@@ -19,8 +16,8 @@ const Home = () => {
    
     return ( 
         <>
-        <div className="min-h-screen">
-                <NavBar/>
+    
+                
         <div>    
         <div className="h-[70dvh] md:h-[70dvh] lg:h-screen items-center flex justify-center rounded-md relative ">
             <img src='https://cdn.pixabay.com/photo/2022/05/22/16/34/woman-7213852_960_720.jpg' className='bg-cover h-full w-full object-cover bg-right' alt="" />
@@ -57,8 +54,7 @@ const Home = () => {
       
 </div>
 </div>
-<Footer/>
-</div>
+
         
         </>
      );

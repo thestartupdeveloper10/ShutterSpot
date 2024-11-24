@@ -1,68 +1,62 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Home from './pages/home/Home';
-import Photographer_Details from './pages/customer/photographer_details/Phographer-Details';
-import Book from './pages/customer/booking/book';
-import AuthPage from './pages/auth/AuthPage';
-import PhotographersListingPage from './pages/customer/all_photographers/PhotographersListingPage';
-import PhotographerDashboard from './pages/photographer/photographer_dashboard/PhotographerDashboard';
-import PhotographerDetailsPage from './pages/photographer/addDetails/PhotographerDetailsPage';
-import UserProfile from './pages/photographer/userProfile/UserProfile';
-import CustomerProfile from './pages/customer/customerProfile/CustomerProfile';
-import CategoryPhotographers from './pages/customer/CategoryPhotographers';
-import ServicesPage from './pages/services/ServicesPage';
 import { useSelector } from 'react-redux';
+import AuthPage from './pages/auth/AuthPage';
+import photographerRoutes from './routes/photographerRoutes';
+import clientRoutes from './routes/clientRoutes';
 
 function App() {
-  const user = useSelector((state) => state.user);
-  const currentUser = user?.currentUser;
+  const { currentUser } = useSelector((state) => state.user);
   const isPhotographer = currentUser?.role === 'photographer';
 
   return (
     <Router>
-      <div className="App w-full h-full bg-gray-50">
-        <div className="main">
-          <Routes>
-            {/* Common Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/photographer/:id" element={<Photographer_Details />} />
-            <Route path="/book" element={<Book />} />
-            <Route path="/photographers" element={<PhotographersListingPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/photographer-dashboard" element={<PhotographerDashboard />} />
-            <Route path="/photographers/category/:category" element={<CategoryPhotographers />} />
+      <Routes>
+        {/* Auth Route */}
+        <Route path="/auth" element={!currentUser ? <AuthPage /> : 
+          isPhotographer ? <Navigate to="/photographer/dashboard" replace /> : 
+          <Navigate to="/" replace />
+        } />
 
-            {/* Conditional Routes */}
-            {isPhotographer && !currentUser?.profile && (
-              <Route path="/photographer-details" element={<PhotographerDetailsPage />} />
-            )}
+        {/* Photographer Routes */}
+        {photographerRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element}>
+            {route.children?.map((childRoute) => (
+              <Route
+                key={childRoute.path}
+                path={childRoute.path}
+                element={childRoute.element}
+              />
+            ))}
+          </Route>
+        ))}
 
-            {isPhotographer && currentUser?.profile && (
-              <Route path="/photographerProfile/:id" element={<UserProfile userData={currentUser} />} />
-            )}
+        {/* Client Routes */}
+        {clientRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element}>
+            {route.children?.map((childRoute) => (
+              <Route
+                key={childRoute.path}
+                path={childRoute.path}
+                element={childRoute.element}
+              />
+            ))}
+          </Route>
+        ))}
 
-            {!isPhotographer && currentUser && (
-              <Route path="/clientProfile/:id" element={<CustomerProfile userData={currentUser} />} />
-            )}
-
-            {/* Fallback Route */}
-            <Route
-              path="*"
-              element={
-                !currentUser ? (
-                  <Navigate to="/auth" replace />
-                ) : isPhotographer && !currentUser?.profile ? (
-                  <Navigate to="/photographer-details" replace />
-                ) : isPhotographer && currentUser?.profile ? (
-                  <Navigate to={`/photographerProfile/${currentUser.id}`} replace />
-                ) : (
-                  <Navigate to={`/clientProfile/${currentUser.id}`} replace />
-                )
-              }
-            />
-          </Routes>
-        </div>
-      </div>
+        {/* Fallback Route */}
+        <Route
+          path="*"
+          element={
+            !currentUser ? (
+              <Navigate to="/auth" replace />
+            ) : isPhotographer ? (
+              <Navigate to="/photographer/dashboard" replace />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+      </Routes>
     </Router>
   );
 }

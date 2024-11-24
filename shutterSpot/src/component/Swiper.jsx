@@ -91,6 +91,7 @@ export function PhotographerCarousel() {
       setIsLoading(true);
       try {
         const res = await publicRequest.get("photographers");
+        console.log('data', res.data)
         setPhotographers(res.data);
       } catch (err) {
         setError(err.message);
@@ -114,7 +115,7 @@ export function PhotographerCarousel() {
       <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">Top Photographers</h1>
       <Carousel opts={{ align: "start" }} className="w-full">
         <CarouselContent>
-          {photographers.map((photographer) => (
+          {photographers.photographers.map((photographer) => (
             <CarouselItem key={photographer.id} className="md:basis-1 lg:basis-1/2 xl:basis-1/3">
               <div className="p-1">
                 <PhotographerCard photographer={photographer} />

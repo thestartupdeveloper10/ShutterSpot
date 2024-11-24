@@ -379,8 +379,8 @@ const Photographer_Details = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavBar />
-      <main className="py-28 md:mx-24 mx-5">
+     
+      <main className="py-12 md:mx-24 mx-5">
         <PhotoGrid images={photographer.photos} />
         
         <ProfileHeader 
@@ -520,7 +520,7 @@ const Photographer_Details = () => {
         </Tabs>
       </main>
       <QuickContact phone={photographer.phone} />
-      <Footer />
+    
     </div>
   );
 };

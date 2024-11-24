@@ -274,7 +274,7 @@ const PhotographersListingPage = () => {
       setIsLoading(true);
       try {
         const res = await publicRequest.get("photographers");
-        setPhotographers(res.data);
+        setPhotographers(res.data.photographers);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -364,8 +364,8 @@ const PhotographersListingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <NavBar />
+   
+  
       <div className="py-28 md:mx-24 mx-5 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Find a Photographer</h1>
@@ -403,8 +403,7 @@ const PhotographersListingPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
-    </div>
+
   );
 };
 
