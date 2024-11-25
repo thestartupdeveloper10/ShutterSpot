@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Outlet, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '@/redux/features/user/userSlice';
 import { 
   LayoutDashboard, 
   Camera, 
@@ -8,7 +9,7 @@ import {
   Settings, 
   User,
   Menu,
-  X
+  X,LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -17,21 +18,22 @@ const PhotographerLayout = () => {
   const { currentUser } = useSelector((state) => state.user);
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   if (!currentUser || currentUser.role !== 'photographer') {
     return <Navigate to="/auth" replace />;
   }
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/auth');
+  };
   const navigationItems = [
     {
       name: 'Dashboard',
       path: '/photographer/dashboard',
       icon: <LayoutDashboard className="w-5 h-5" />
-    },
-    {
-      name: 'Portfolio',
-      path: '/photographer/portfolio',
-      icon: <Camera className="w-5 h-5" />
     },
     {
       name: 'Bookings',
@@ -98,7 +100,12 @@ const PhotographerLayout = () => {
                 <span>{item.name}</span>
               </Link>
             ))}
+            <div className='flex '>
+            <Button className='w-full mt-4' onClick={handleLogout}><LogOut className='mr-2'/> Log Out</Button>
+            </div>
+            
           </div>
+          
         </nav>
       </aside>
 

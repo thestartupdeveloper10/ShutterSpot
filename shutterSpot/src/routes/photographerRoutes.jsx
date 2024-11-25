@@ -22,7 +22,6 @@ const photographerRoutes = [
       { path: 'profile', element: <UserProfile /> },
       { path: 'edit-details', element: <PhotographerDetailsPage /> },
       { path: 'bookings', element: <BookingManagement /> },
-      // { path: 'portfolio', element: <PhotographerPortfolio /> },
       { path: 'settings', element: <PhotographerSettings /> },
     ],
   },
