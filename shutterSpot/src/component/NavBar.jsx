@@ -11,12 +11,13 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const isClient = user?.currentUser?.role === 'client';
+  const isLoggedIn = Boolean(user?.currentUser);
 
   const clientNavItems = [
     { name: 'Home', path: '/' },
     { name: 'Explore', path: '/photographers' },
     { name: 'Services', path: '/services' },
-    { name: 'My Bookings', path: '/bookings' },
+    { name: 'My Bookings', path: '/bookings', show: isLoggedIn },
   ];
 
   const clientFeatures = [
@@ -58,21 +59,32 @@ const NavBar = () => {
             {isClient && (
               <>
                 {/* Main Navigation Items */}
-                <div className="flex space-x-4">
-                  {clientNavItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      className={`px-3 py-2 rounded-md text-sm font-medium ${
-                        location.pathname === item.path
-                          ? 'text-purple-600 bg-purple-50'
-                          : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
-                      } transition-colors duration-200`}
-                    >
-                      {item.name}
-                    </Link>
+                <ul className="flex space-x-4">
+                  {clientNavItems.map((item) => item.show !== false && (
+                    <li key={item.name}>
+                      <Link
+                        to={item.path}
+                        className={`px-3 py-2 rounded-md text-sm font-medium ${
+                          location.pathname === item.path
+                            ? 'text-purple-600 bg-purple-50'
+                            : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                        } transition-colors duration-200`}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                  {!isLoggedIn && (
+                    <li>
+                      <Link
+                        to="/auth"
+                        className={`px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200`}
+                      >
+                        Login/Register
+                      </Link>
+                    </li>
+                  )}
+                </ul>
 
                 {/* Feature Icons */}
                 <div className="flex items-center space-x-2 ml-4">
@@ -92,6 +104,46 @@ const NavBar = () => {
                   ))}
                 </div>
               </>
+            )}
+            {!isClient && (
+              <ul className="flex space-x-4">
+                <li>
+                  <Link
+                    to="/"
+                    className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      location.pathname === '/'
+                        ? 'text-purple-600 bg-purple-50'
+                        : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                    } transition-colors duration-200`}
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/photographers"
+                    className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      location.pathname === '/photographers'
+                        ? 'text-purple-600 bg-purple-50'
+                        : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                    } transition-colors duration-200`}
+                  >
+                    Explore
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/services"
+                    className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      location.pathname === '/services'
+                        ? 'text-purple-600 bg-purple-50'
+                        : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                    } transition-colors duration-200`}
+                  >
+                    Services
+                  </Link>
+                </li>
+              </ul>
             )}
 
             {/* User Profile Section */}
@@ -116,13 +168,15 @@ const NavBar = () => {
                 </div>
               </div>
             ) : (
-              <Link
-                to="/auth"
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200"
-              >
-                <User className="w-5 h-5" />
-                <span>Login</span>
-              </Link>
+              <div className="flex items-center ml-4 space-x-2">
+                <Link
+                  to="/auth"
+                  className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                >
+                  <User className="w-5 h-5" />
+                  <span>Login/Register</span>
+                </Link>
+              </div>
             )}
           </div>
 
@@ -141,20 +195,42 @@ const NavBar = () => {
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {isClient && clientNavItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    location.pathname === item.path
-                      ? 'text-purple-600 bg-purple-50'
-                      : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
-                  } transition-colors duration-200`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              
+              <ul className="flex flex-col space-y-2">
+                {clientNavItems.map((item) => item.show !== false && (
+                  <li key={item.name}>
+                    <Link
+                      to={item.path}
+                      className={`block px-3 py-2 rounded-md text-base font-medium ${
+                        location.pathname === item.path
+                          ? 'text-purple-600 bg-purple-50'
+                          : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                      } transition-colors duration-200`}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+                {!isLoggedIn && (
+                  <li>
+                    <Link
+                      to="/login"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                    >
+                      Login
+                    </Link>
+                  </li>
+                )}
+                {!isLoggedIn && (
+                  <li>
+                    <Link
+                      to="/register"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                    >
+                      Register
+                    </Link>
+                  </li>
+                )}
+              </ul>
               {/* Mobile Feature Icons */}
               <div className="flex flex-wrap gap-2 pt-2">
                 {clientFeatures.map((feature) => (
@@ -195,15 +271,20 @@ const NavBar = () => {
                   </button>
                 </div>
               ) : (
-                <Link
-                  to="/auth"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200"
-                >
-                  <div className="flex items-center space-x-2">
-                    <User className="w-5 h-5" />
-                    <span>Login</span>
-                  </div>
-                </Link>
+                <div className="flex flex-col space-y-2">
+                  <Link
+                    to="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-colors duration-200"
+                  >
+                    Register
+                  </Link>
+                </div>
               )}
             </div>
           </div>
