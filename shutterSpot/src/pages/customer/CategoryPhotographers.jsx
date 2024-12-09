@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import { Star, MapPin, Camera, Heart, Award, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { publicRequest } from '@/service/requestMethods';
-import NavBar from '@/component/NavBar';
-import Footer from '@/component/Footer';
 
 
 const CategoryPhotographers = () => {
@@ -22,7 +20,6 @@ const CategoryPhotographers = () => {
         const response = await publicRequest.get(`photographers/category/${category}`);
         if (Array.isArray(response.data)) {
           setPhotographers(response.data);
-          console.log("data", response.data);
         } else {
           setPhotographers([]);
         }
@@ -96,7 +93,7 @@ const CategoryPhotographers = () => {
 
   return (
     
-    <div className="py-28 md:mx-24 mx-5 bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="my-10 py-10 rounded-md md:py-12 px-5 mx-5 bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="max-w-7xl mx-auto">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}

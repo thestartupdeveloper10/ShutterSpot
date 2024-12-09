@@ -6,6 +6,7 @@ import PhotographerDetails from '@/pages/customer/photographer_details/Phographe
 import BookingsPage from '@/pages/customer/booking/book';
 import ClientProfile from '@/pages/customer/customerProfile/CustomerProfile';
 import ClientLayout from '@/layouts/ClientLayout';
+import CategoryPhotographers from '@/pages/customer/CategoryPhotographers';
 
 const clientRoutes = [
   {
@@ -18,6 +19,7 @@ const clientRoutes = [
       { path: 'photographer/:id', element: <PhotographerDetails /> },
       { path: 'bookings', element: <BookingsPage /> },
       { path: 'profile', element: <ClientProfile /> },
+      { path: 'photographers/category/:category', element: <CategoryPhotographers /> },
     ],
   },
 ];

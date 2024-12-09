@@ -1,18 +1,13 @@
 import React from 'react';
-import { 
-  Camera, 
-  Clock, 
-  ShieldCheck,
-  Users,
+import {
   Star,
   Image as ImageIcon,
-  MessageSquare,
-  Award
 } from 'lucide-react';
 
 import couple from '../assets/imgs/couples/couple-wedding.jpg';
 import man from '../assets/imgs/Mmodels/man-potraite.jpg';
 import family from '../assets/imgs/couples/family.jpg';
+import { Link } from 'react-router-dom';
 
 
 
@@ -42,7 +37,7 @@ const Capture = () => {
   ];
 
   return (
-    <div className="bg-gray-50 py-20">
+    <div className="bg-gray-50 py-20 md:px-10 px-5 mb-10">
       <div className="">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -89,9 +84,11 @@ const Capture = () => {
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Photography Journey?</h2>
           <p className="text-lg mb-8 text-white/90">Join thousands of satisfied clients who have found their perfect photographer</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to='/photographers'>
             <button className="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
               Find a Photographer
             </button>
+            </Link>
             <button className="border-2 border-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-colors">
               Learn More
             </button>

@@ -1,20 +1,15 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 import { ArrowRight, Camera } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-import imgBG1 from '../assets/imgs/couples/couple-landscape.jpg';
-import strawbberry from '../assets/imgs/food/hamburger-1238246_1280.jpg';
-import wedding from '../assets/imgs/wedding/bride-1255520_1280.jpg';
-import female from '../assets/imgs/streets/nike-5126389_1280.jpg';
-import workout from '../assets/imgs/Mmodels/man-gym.jpg';
-import studio from '../assets/imgs/Fmodels/fashion-6066661_1280.jpg';
 
 const ServiceCard = ({ image, title, description, isLarge = false }) => {
   const navigate = useNavigate();
 
   const handleExplore = () => {
     const category = title.toLowerCase().replace(/['\s]/g, '-');
+    console.log('this is my category',category)
     navigate(`/photographers/category/${category}`);
   };
 
@@ -72,38 +67,38 @@ const ServiceCard = ({ image, title, description, isLarge = false }) => {
 const Services = () => {
   const services = [
     {
-      image: imgBG1,
+      image: 'https://cdn.pixabay.com/photo/2015/03/30/12/35/sunset-698501_1280.jpg',
       title: "Wedding Photography",
       description: "From intimate ceremonies to grand celebrations, capture the magic of your special day with our professional wedding photography services.",
       isLarge: true
     },
     {
-      image: studio,
+      image: 'https://cdn.pixabay.com/photo/2017/03/27/13/28/man-2178721_1280.jpg',
       title: "Studio Photoshoots",
       description: "Professional studio sessions with state-of-the-art equipment and creative lighting for stunning portraits and fashion shoots."
     },
     {
-      image: workout,
+      image: 'https://cdn.pixabay.com/photo/2018/04/07/19/39/woman-3299379_1280.jpg',
       title: "Fashion Photography",
       description: "Elevate your fashion brand with dynamic and stylish photography that brings your designs to life."
     },
     {
-      image: female,
+      image: 'https://cdn.pixabay.com/photo/2023/05/20/16/35/dog-8006807_1280.jpg',
       title: "Portrait Photography",
       description: "Capture your unique personality with our professional portrait photography services, perfect for individuals and families."
     },
     {
-      image: strawbberry,
+      image: 'https://cdn.pixabay.com/photo/2017/09/16/19/21/salad-2756467_1280.jpg',
       title: "Food Photography",
       description: "Showcase your culinary creations with appetizing food photography that makes every dish look irresistible."
     },
     {
-      image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?q=80&w=1470&auto=format&fit=crop",
+      image: "https://cdn.pixabay.com/photo/2016/10/31/02/29/woman-1784755_1280.jpg",
       title: "Travel Photography",
       description: "Explore the world through our lens with professional travel photography that captures the essence of destinations."
     },
     {
-      image: wedding,
+      image: 'https://cdn.pixabay.com/photo/2016/07/05/19/59/christening-1499314_1280.jpg',
       title: "Event Photography",
       description: "Professional coverage for corporate events, concerts, and special occasions, ensuring every moment is perfectly preserved.",
       isLarge: true
@@ -111,7 +106,7 @@ const Services = () => {
   ];
 
   return (
-    <section className=" bg-gray-50">
+    <section className=" bg-gray-50 px-5 py-8 md:px-10 mb-10 rounded-md">
       {/* Header Section */}
       <div className=" mb-12">
         <motion.div 
@@ -153,11 +148,13 @@ const Services = () => {
           transition={{ duration: 0.5 }}
           className="mt-16 text-center"
         >
+          <Link to="/photographers">
           <button className="group inline-flex items-center gap-3 px-8 py-4 bg-black text-white rounded-full hover:bg-gray-900 transition-all duration-300">
             <Camera className="w-5 h-5" />
             <span className="font-semibold">Start Your Photography Journey</span>
             <ArrowRight className="w-5 h-5 transform transition-transform group-hover:translate-x-1" />
           </button>
+          </Link>
         </motion.div>
       </div>
     </section>
