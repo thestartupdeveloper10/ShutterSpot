@@ -6,20 +6,29 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import NavBar from '@/component/NavBar';
-import Footer from '@/component/Footer';
 import { userRequest } from '@/service/requestMethods';
 import { useSelector } from 'react-redux';
 import kenyaCounties from '@/utils/kenyaCounties';
 
 const PhotographerDetailsPage = () => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user.currentUser);
   const navigate = useNavigate();
+
+  // Redirect if user is not logged in or is not a photographer
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    } else if (user.role !== 'photographer') {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   
   const [formData, setFormData] = useState({
-    userId: user.id,
-    name: '',
+    userId: user?.id,
+    name: user?.username || '',
     about: '',
     portfolio: '',
     phone: '',
@@ -34,9 +43,10 @@ const PhotographerDetailsPage = () => {
     experienceYears: 0,
     location: '',
     services: [],
-    priceRange: '',
+    priceType: '',
+    price: '',
     photos: [],
-    profilePic:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+    profilePic: user?.profilePic || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
   });
 
   const [portfolioImages, setPortfolioImages] = useState([]);
@@ -151,9 +161,12 @@ const PhotographerDetailsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
+    const combinedPrice = `Ksh ${formData.price}/${formData.priceType}`;
     const formDataToSubmit = {
       ...formData,
+      priceRange: combinedPrice,
       experienceYears: parseInt(formData.experienceYears, 10)
     }
 
@@ -161,19 +174,20 @@ const PhotographerDetailsPage = () => {
       const response = await userRequest.post('photographers', formDataToSubmit);
 
       if (response.status === 201) {
-        console.log('return data',response.data.userId)
-        navigate(`/photographerProfile/${response.data.userId}`);
+        console.log('Profile created successfully:', response.data);
+        navigate('/photographer/dashboard');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div>
-      <NavBar />
-      <div className="flex items-center justify-center min-h-screen py-24">
-        <Card className="w-full max-w-3xl">
+      <div className="flex items-center justify-center min-h-screen py-5 md:py-10">
+        <Card className="w-full ">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">Complete Your Photographer Profile</CardTitle>
           </CardHeader>
@@ -391,29 +405,32 @@ const PhotographerDetailsPage = () => {
                   />
                 </div>
 
-
-              {/* Price Range */}
+              {/* Price Type */}
               <div className="space-y-2">
-                <Label htmlFor="priceRange">Price Range</Label>
+                <Label htmlFor="priceType">Price Type</Label>
                 <Select 
-                  value={formData.priceRange}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, priceRange: value }))}
+                  value={formData.priceType}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, priceType: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select price range" />
+                    <SelectValue placeholder="Select price type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Ksh 100/photo">Ksh 100/photo</SelectItem>
-                    <SelectItem value="Ksh 150/photo">Ksh 150/photo</SelectItem>
-                    <SelectItem value="Ksh 200/photo">Ksh 200/photo</SelectItem>
-                    <SelectItem value="Ksh 500/photo">Ksh 500/photo</SelectItem>
-                    <SelectItem value="Ksh 1000/hr">Ksh 1000/hr</SelectItem>
-                    <SelectItem value="Ksh 2000/hr">Ksh 2000/hr</SelectItem>
-                    <SelectItem value="Ksh 3000/hr">Ksh 3000/hr</SelectItem>
-                    <SelectItem value="Ksh 5000/hr">Ksh 5000/hr</SelectItem>
-                    <SelectItem value="Ksh 5000+/hr">Ksh 5000+/hr</SelectItem>
+                    <SelectItem value="photo">Photo</SelectItem>
+                    <SelectItem value="hour">Hour</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Price */}
+              <div className="space-y-2">
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                  placeholder="Enter price"
+                />
               </div>
 
               {/* Portfolio Images Upload Section */}
@@ -458,14 +475,13 @@ const PhotographerDetailsPage = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-                Complete Profile
+              <Button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-700">
+                {isSubmitting ? 'Submitting...' : 'Complete Profile'}
               </Button>
             </form>
           </CardContent>
         </Card>
       </div>
-      <Footer/>
     </div>
   );
 };

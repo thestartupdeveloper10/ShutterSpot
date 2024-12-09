@@ -73,8 +73,13 @@ const Settings = () => {
   const [activeDialog, setActiveDialog] = useState(null);
   const router = useNavigate()
   const profile = userData.profile;
+
   console.log(profile)
 
+  const navigate = useNavigate();
+  if (profile===null){
+    navigate('/photographer/addDetails');
+  }
 
   const handleAdd = (category) => (newItem) => {
     setUserData(prev => ({

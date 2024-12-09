@@ -1,43 +1,62 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend 
 } from 'recharts';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const PhotographerDashboard = () => {
   const user = useSelector((state) => state.user.currentUser);
+  const navigate = useNavigate();
 
-  if (!user || !user.profile) {
-    return <div>Loading...</div>;
+  useEffect(() => {
+    if (user?.profile === null) {
+      navigate('/photographer/addDetails');
+    }
+  }, [user, navigate]);
+
+  // Early return if user or critical data is not available
+  if (!user || user.profile === null || !user.bookings) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  // Process bookings by month
-  const bookingsByMonth = user.bookings.reduce((acc, booking) => {
+  // Process bookings by month - only if we have bookings
+  const bookingsByMonth = (user.bookings || []).reduce((acc, booking) => {
     const month = new Date(booking.date || booking.createdAt).toLocaleString('default', { month: 'short' });
     acc[month] = (acc[month] || 0) + 1;
     return acc;
   }, {});
 
-  const bookingsData = Object.entries(bookingsByMonth).map(([month, count]) => ({
+  // Transform data for charts - with null checks
+  const monthlyData = Object.entries(bookingsByMonth).map(([month, count]) => ({
     month,
     bookings: count
   }));
 
+  // Calculate statistics with null checks
+  const totalBookings = user.bookings?.length || 0;
+  const completedBookings = user.bookings?.filter(booking => booking.status === 'completed')?.length || 0;
+  const pendingBookings = user.bookings?.filter(booking => booking.status === 'pending')?.length || 0;
+
+  const pieData = [
+    { name: 'Completed', value: completedBookings },
+    { name: 'Pending', value: pendingBookings }
+  ];
+
   // Process services data for pie chart
-  const servicesData = user.profile.services.map(service => ({
+  const servicesData = (user.profile.services || []).map(service => ({
     name: service,
     value: 1
   }));
 
   // Process skills data for bar chart
-  const skillsData = user.profile.skills.map(skill => ({
+  const skillsData = (user.profile.skills || []).map(skill => ({
     name: skill,
     value: 1
   }));
 
-  // Colors for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   return (
@@ -53,7 +72,7 @@ const PhotographerDashboard = () => {
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={bookingsData}>
+                <LineChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
@@ -118,6 +137,34 @@ const PhotographerDashboard = () => {
                     ))}
                   </Bar>
                 </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Booking Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Booking Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </CardContent>

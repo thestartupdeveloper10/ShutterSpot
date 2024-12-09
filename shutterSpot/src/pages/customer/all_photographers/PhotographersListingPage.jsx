@@ -366,7 +366,7 @@ const PhotographersListingPage = () => {
   return (
    
   
-      <div className="py-28 md:mx-24 mx-5 px-4">
+      <div className="py-8 md:mx-24 mx-5 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Find a Photographer</h1>
           

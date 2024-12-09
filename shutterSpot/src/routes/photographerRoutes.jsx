@@ -20,7 +20,7 @@ const photographerRoutes = [
       { path: '', element: <Navigate to="dashboard" replace /> },
       { path: 'dashboard', element: <PhotographerDashboard /> },
       { path: 'profile', element: <UserProfile /> },
-      { path: 'edit-details', element: <PhotographerDetailsPage /> },
+      { path: 'addDetails', element: <PhotographerDetailsPage /> },
       { path: 'bookings', element: <BookingManagement /> },
       { path: 'settings', element: <PhotographerSettings /> },
     ],
