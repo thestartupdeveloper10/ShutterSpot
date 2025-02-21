@@ -15,10 +15,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import NavBar from "@/component/NavBar";
-import Footer from "@/component/Footer";
+import { useSelector } from "react-redux";
 
-const CustomerProfile = ({ userData }) => {
+
+const CustomerProfile = () => {
+
+  const userData = useSelector((state) => state.user)
+  console.log('user', userData)
   const { username, email, profile, bookings, reviews } = userData;
 
   const renderBookingStatus = (status) => {

@@ -3,14 +3,37 @@ const express = require("express");
 const createError = require('http-errors');
 const { verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin,} = require("./verifyToken");
 const { PrismaClient } = require('@prisma/client')
+const { body } = require('express-validator');
+const validateRequest = require('../middleware/validateRequest');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 const prisma = new PrismaClient()
 
+// Validation schemas
+const photographerValidation = [
+  body('name').trim().notEmpty().withMessage('Name is required'),
+  body('about').trim().notEmpty().withMessage('About section is required'),
+  body('phone').trim().notEmpty().matches(/^\+?[\d\s-]+$/).withMessage('Valid phone number is required'),
+  body('skills').isArray().withMessage('Skills must be an array'),
+  body('cameras').isArray().withMessage('Cameras must be an array'),
+  body('lenses').isArray().withMessage('Lenses must be an array'),
+  body('experienceYears').isInt({ min: 0 }).withMessage('Experience years must be a positive number'),
+  body('location').trim().notEmpty().withMessage('Location is required'),
+  body('services').isArray().withMessage('Services must be an array'),
+  body('priceRange').trim().notEmpty().withMessage('Price range is required'),
+];
+
 const photographerRouter = express.Router();
 
+// Apply rate limiting to all routes
+photographerRouter.use(apiLimiter);
 
 // CREATE PHOTOGRAPHER PROFILE
-photographerRouter.post("/", verifyToken, async (req, res, next) => {
+photographerRouter.post("/", 
+  verifyToken, 
+  photographerValidation,
+  validateRequest,
+  async (req, res, next) => {
   try {
     const { id: userId, role } = req.user;
 
@@ -92,9 +115,12 @@ photographerRouter.post("/", verifyToken, async (req, res, next) => {
   }
 });
 
-
 // UPDATE
-photographerRouter.put("/:id", verifyToken, async (req, res, next) => {
+photographerRouter.put("/:id", 
+  verifyToken,
+  photographerValidation,
+  validateRequest,
+  async (req, res, next) => {
   try {
     if (req.body.password) {
       const saltRounds = 10;
@@ -151,16 +177,40 @@ photographerRouter.get("/find/:id", async (req, res, next) => {
   }
 });
 
-// GET ALL PHOTOGRAPHERS
+// GET ALL PHOTOGRAPHERS WITH PAGINATION
 photographerRouter.get("/", async (req, res, next) => {
-  const query = req.query.new;
   try {
-    const photographers = query
-      ? await prisma.photographer.findMany()
-      : await prisma.photographer.findMany()
-    res.status(200).json(photographers);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const [photographers, total] = await Promise.all([
+      prisma.photographer.findMany({
+        skip,
+        take: limit,
+        include: {
+          user: {
+            select: {
+              email: true,
+              role: true
+            }
+          }
+        }
+      }),
+      prisma.photographer.count()
+    ]);
+
+    res.json({
+      photographers,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit
+      }
+    });
   } catch (err) {
-    next(createError(500, 'Error retrieving photographers'));
+    next(createError(500, "Error fetching photographers"));
   }
 });
 
@@ -206,8 +256,5 @@ photographerRouter.get("/category/:category", async (req, res, next) => {
     next(createError(500, 'Error fetching photographers'));
   }
 });
-
-// GET USER STATS
-
 
 module.exports = photographerRouter;

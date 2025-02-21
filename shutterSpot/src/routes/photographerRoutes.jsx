@@ -7,6 +7,7 @@ import PhotographerSettings from '@/pages/photographer/Settings';
 // import PhotographerPortfolio from '@/pages/photographer/Portfolio';
 import PhotographerLayout from '@/layouts/PhotographerLayout';
 import { useSelector } from 'react-redux';
+import Chat from '@/pages/photographer/chat/Chat';
 
 
 
@@ -19,6 +20,7 @@ const photographerRoutes = [
     children: [
       { path: '', element: <Navigate to="dashboard" replace /> },
       { path: 'dashboard', element: <PhotographerDashboard /> },
+      { path: 'chat', element: <Chat /> },
       { path: 'profile', element: <UserProfile /> },
       { path: 'addDetails', element: <PhotographerDetailsPage /> },
       { path: 'bookings', element: <BookingManagement /> },

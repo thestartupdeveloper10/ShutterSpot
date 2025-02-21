@@ -16,8 +16,7 @@ const NavBar = () => {
   const clientNavItems = [
     { name: 'Home', path: '/' },
     { name: 'Explore', path: '/photographers' },
-    { name: 'Services', path: '/services' },
-    { name: 'My Bookings', path: '/bookings', show: isLoggedIn },
+    { name: 'My Bookings', path: '/my-bookings', show: isLoggedIn },
   ];
 
   const clientFeatures = [
@@ -28,7 +27,7 @@ const NavBar = () => {
     },
     { 
       name: 'Favorites', 
-      path: '/favorites',
+      path: '/favourites',
       icon: <Heart className="w-5 h-5" /> 
     },
     { 
@@ -131,18 +130,6 @@ const NavBar = () => {
                     Explore
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/services"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${
-                      location.pathname === '/services'
-                        ? 'text-purple-600 bg-purple-50'
-                        : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
-                    } transition-colors duration-200`}
-                  >
-                    Services
-                  </Link>
-                </li>
               </ul>
             )}
 
@@ -150,11 +137,13 @@ const NavBar = () => {
             {user?.currentUser ? (
               <div className="flex items-center ml-4 space-x-2">
                 <div className="flex items-center space-x-3 px-3 py-2 rounded-md bg-gray-50">
+                  <Link to={'/profile'}>
                   <img 
                     src={user.currentUser.profilePicture || 'https://via.placeholder.com/32'} 
                     alt={user.currentUser.username}
                     className="w-8 h-8 rounded-full object-cover"
                   />
+                  </Link>
                   <span className="text-sm font-medium text-gray-700">
                     {user.currentUser.username}
                   </span>

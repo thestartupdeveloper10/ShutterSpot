@@ -287,6 +287,7 @@ const PhotoGrid = ({ images }) => (
 );
 
 const ProfileHeader = ({ name, location, experience, image, status }) => (
+  
   <Card className="mt-8">
     <CardContent className="flex flex-col md:flex-row items-center gap-6 p-6">
       <div className="relative">
