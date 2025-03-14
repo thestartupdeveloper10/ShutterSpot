@@ -45,3 +45,20 @@ userRequest.interceptors.request.use((config) => {
   console.log("Headers before request:", config.headers);
   return config;
 });
+
+// Add a request interceptor to automatically add the token
+publicRequest.interceptors.request.use(
+  (config) => {
+    const user = JSON.parse(localStorage.getItem("persist:root"))?.user;
+    const currentUser = user && JSON.parse(user).currentUser;
+    const TOKEN = currentUser?.token;
+    
+    if (TOKEN) {
+      config.headers.Authorization = `Bearer ${TOKEN}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);

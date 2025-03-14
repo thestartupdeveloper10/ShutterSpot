@@ -8,37 +8,46 @@ const bookingRouter = express.Router();
 
 // CREATE BOOKING - Only clients can create bookings
 bookingRouter.post("/", verifyToken, async (req, res, next) => {
-    try {
-      console.log("User info from token:", req.user);
+  try {
+    const { id, role } = req.user;
 
-      const { id, role } = req.user; // Extract user info from token
-  
-      // Only allow clients to create bookings
-      if (role !== "client") {
-        return res.status(403).json({ error: "Only clients can create bookings" });
-      }
-  
-      const { photographerId, startDate, endDate, location, duration, totalPrice } = req.body;
-  
-      const newBooking = await prisma.booking.create({
-        data: {
-          photographerId,
-          clientId: id, // Set clientId as the authenticated client's ID
-          startDate: new Date(startDate),
-          endDate: new Date(endDate),
-          location,
-          duration,
-          totalPrice,
-        },
-      });
-  
-      res.status(201).json(newBooking);
-    } catch (err) {
-      console.error("Prisma error:", err);
-      next(createError(500, "Error creating booking"));
+    if (role !== "client") {
+      return res.status(403).json({ error: "Only clients can create bookings" });
     }
-  });
-  
+
+    const { 
+      photographerId, 
+      location, 
+      duration, 
+      totalPrice,
+      date,          // Format: "2025-03-15"
+      startTime,     // Format: "08:00"
+      endTime        // Format: "09:00"
+    } = req.body;
+
+    // Combine date and time strings to create proper Date objects
+    const startDate = new Date(`${date}T${startTime}:00`);
+    const endDate = new Date(`${date}T${endTime}:00`);
+
+    const newBooking = await prisma.booking.create({
+      data: {
+        photographerId,
+        clientId: id,
+        startDate,
+        endDate,
+        location,
+        duration: parseInt(duration),
+        totalPrice: parseFloat(totalPrice),
+        status: 'pending'
+      },
+    });
+
+    res.status(201).json(newBooking);
+  } catch (err) {
+    console.error("Prisma error:", err);
+    next(createError(500, "Error creating booking"));
+  }
+});
 
 // UPDATE BOOKING
 bookingRouter.put("/:id", verifyToken, async (req, res, next) => {
@@ -109,6 +118,33 @@ bookingRouter.get("/", verifyToken, verifyTokenAndAdmin, async (req, res, next) 
     res.status(200).json(bookings);
   } catch (err) {
     next(createError(500, "Error retrieving bookings"));
+  }
+});
+
+// GET CLIENT'S BOOKINGS
+bookingRouter.get("/client/:clientId", verifyToken, async (req, res, next) => {
+  try {
+    const bookings = await prisma.booking.findMany({
+      where: { 
+        clientId: req.params.clientId 
+      },
+      include: {
+        photographer: {
+          select: {
+            name: true,
+            profilePic: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    res.status(200).json(bookings);
+  } catch (err) {
+    console.error("Error fetching client bookings:", err);
+    next(createError(500, "Error retrieving client bookings"));
   }
 });
 

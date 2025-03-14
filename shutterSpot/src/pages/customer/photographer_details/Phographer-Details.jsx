@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar as CalendarIcon, Camera, Aperture, Globe, Users, Smile, Camera as CameraIcon, Shield, ArrowUp, Mail, Phone, MessageSquare } from 'lucide-react';
-import { Calendar } from "@/components/ui/calendar";
 import { format } from 'date-fns';
 import NavBar from '@/component/NavBar';
 import Footer from '@/component/Footer';
@@ -15,7 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select,SelectGroup, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Card,
@@ -29,47 +27,92 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { publicRequest } from '@/service/requestMethods';
-import { useSelector } from 'react-redux';
+import { userRequest } from '@/service/requestMethods';
+import { useSelector, useDispatch } from 'react-redux';
+import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { createBooking } from '@/redux/apiCalls';
 
-const BookingForm = ({ photographerName, photographerId }) => {
+const BookingForm = ({ photographer }) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
   const [date, setDate] = useState(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [numberOfPhotos, setNumberOfPhotos] = useState(1);
   
   const [formData, setFormData] = useState({
-    photographerId: photographerId,
+    photographerId: photographer?._id,
     clientId: user?.currentUser?.id || '',
-    location: '',
+    location: photographer?.location || '',
     duration: '',
     totalPrice: '',
     message: '',
     status: 'pending'
   });
 
-  // Generate time options from 8 AM to 5 PM
-  const timeOptions = [];
-  for (let i = 8; i <= 17; i++) {
-    const hour = i.toString().padStart(2, '0');
-    timeOptions.push(`${hour}:00`);
-    timeOptions.push(`${hour}:30`);
-  }
+  // Generate time options from 8 AM to 8 PM
+  const timeOptions = Array.from({ length: 25 }, (_, i) => {
+    const hour = Math.floor(i / 2) + 8;
+    const minute = i % 2 === 0 ? '00' : '30';
+    const time = `${hour.toString().padStart(2, '0')}:${minute}`;
+    return time;
+  }).filter(time => {
+    const hour = parseInt(time.split(':')[0]);
+    return hour < 20; // Only include times before 8 PM
+  });
 
+  // Helper function to parse price from priceRange
+  const getPriceFromRange = (priceRange) => {
+    if (!priceRange) return 0;
+    const match = priceRange.match(/\d+/);
+    return match ? parseInt(match[0]) : 0;
+  };
+
+  // Determine pricing model from priceRange
+  const getPricingModel = (priceRange) => {
+    if (!priceRange) return 'hourly';
+    return priceRange.toLowerCase().includes('/hr') ? 'hourly' : 'perPhoto';
+  };
+
+  // Calculate price based on photographer's pricing model
   useEffect(() => {
-    if (startTime && endTime) {
-      const start = new Date(`2000/01/01 ${startTime}`);
-      const end = new Date(`2000/01/01 ${endTime}`);
-      const durationHours = (end - start) / (1000 * 60 * 60);
-      
-      if (durationHours > 0) {
-        setFormData(prev => ({
-          ...prev,
-          duration: durationHours.toString()
-        }));
+    if (!photographer) return;
+
+    const pricingModel = getPricingModel(photographer.priceRange);
+    const basePrice = getPriceFromRange(photographer.priceRange);
+    let calculatedPrice = 0;
+    
+    if (pricingModel === 'hourly') {
+      if (startTime && endTime) {
+        const start = new Date(`2000/01/01 ${startTime}`);
+        const end = new Date(`2000/01/01 ${endTime}`);
+        const durationHours = (end - start) / (1000 * 60 * 60);
+        
+        if (durationHours > 0) {
+          calculatedPrice = durationHours * basePrice;
+          setFormData(prev => ({
+            ...prev,
+            duration: durationHours.toString(),
+            totalPrice: calculatedPrice.toString()
+          }));
+        }
       }
+    } else {
+      calculatedPrice = numberOfPhotos * basePrice;
+      setFormData(prev => ({
+        ...prev,
+        duration: startTime && endTime ? 
+          ((new Date(`2000/01/01 ${endTime}`) - new Date(`2000/01/01 ${startTime}`)) / (1000 * 60 * 60)).toString() : 
+          '',
+        totalPrice: calculatedPrice.toString()
+      }));
     }
-  }, [startTime, endTime]);
+  }, [startTime, endTime, numberOfPhotos, photographer]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,23 +124,62 @@ const BookingForm = ({ photographerName, photographerId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!user?.currentUser) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to book a session",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
+
+    if (!date) {
+      toast({
+        title: "Date Required",
+        description: "Please select a date for your booking",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const bookingData = {
-      ...formData,
-      date,
+      photographerId: photographer.id,
+      clientId: user.currentUser.id,
+      location: formData.location,
+      duration: formData.duration,
+      totalPrice: formData.totalPrice,
+      date: format(date, 'yyyy-MM-dd'),
       startTime,
-      endTime,
+      endTime
     };
     
     try {
-      const response = await publicRequest.post('/bookings', bookingData);
-      console.log('Booking created:', response.data);
+      await createBooking(dispatch, bookingData);
+      toast({
+        title: "Success",
+        description: "Booking created successfully",
+      });
+      navigate('/profile');
     } catch (error) {
-      console.error('Error creating booking:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create booking",
+        variant: "destructive",
+      });
     }
   };
 
+  // Add this function to filter out past dates
+  const filterPastDates = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date >= today;
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto p-4 md:p-6 lg:p-8 space-y-6 bg-white rounded-lg shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-4 md:col-span-2">
           <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
@@ -141,103 +223,74 @@ const BookingForm = ({ photographerName, photographerId }) => {
           
           <div>
             <label className="text-sm font-medium text-gray-700">Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full mt-1 justify-start text-left">
-                  {date ? format(date, 'PPP') : (
-                    <span className="text-gray-500">Pick a date</span>
-                  )}
-                  <CalendarIcon className="ml-auto h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                  disabled={(date) => date < new Date()}
-                />
-              </PopoverContent>
-            </Popover>
+            <div className="mt-1">
+              <DatePicker
+                selected={date}
+                onChange={(date) => setDate(date)}
+                dateFormat="MMMM d, yyyy"
+                minDate={new Date()}
+                filterDate={filterPastDates}
+                placeholderText="Select a date"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700">Start Time</label>
-              <Select 
-                value={startTime} 
-                onValueChange={(value) => setStartTime(value)}
+              <select
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
               >
-                <SelectTrigger className="w-full mt-1">
-                  <SelectValue placeholder="Select start time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {timeOptions.map((time) => (
-                      <SelectItem 
-                        key={time} 
-                        value={time}
-                        disabled={endTime && time >= endTime}
-                      >
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                <option value="">Select start time</option>
+                {timeOptions.map((time) => (
+                  <option 
+                    key={time} 
+                    value={time}
+                    disabled={endTime && time >= endTime}
+                  >
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
               <label className="text-sm font-medium text-gray-700">End Time</label>
-              <Select 
-                value={endTime} 
-                onValueChange={(value) => setEndTime(value)}
+              <select
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
               >
-                <SelectTrigger className="w-full mt-1">
-                  <SelectValue placeholder="Select end time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {timeOptions.map((time) => (
-                      <SelectItem 
-                        key={time} 
-                        value={time}
-                        disabled={startTime && time <= startTime}
-                      >
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                <option value="">Select end time</option>
+                {timeOptions.map((time) => (
+                  <option 
+                    key={time} 
+                    value={time}
+                    disabled={startTime && time <= startTime}
+                  >
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          {getPricingModel(photographer?.priceRange) === 'perPhoto' && (
             <div>
-              <label className="text-sm font-medium text-gray-700">Duration (hours)</label>
+              <label className="text-sm font-medium text-gray-700">Number of Photos</label>
               <Input
-                name="duration"
-                value={formData.duration}
-                disabled
-                className="mt-1 bg-gray-50"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">Total Price</label>
-              <Input
-                name="totalPrice"
                 type="number"
-                value={formData.totalPrice}
-                onChange={handleInputChange}
-                placeholder="Total price"
-                required
+                min="1"
+                value={numberOfPhotos}
+                onChange={(e) => setNumberOfPhotos(parseInt(e.target.value) || 1)}
                 className="mt-1"
               />
             </div>
-          </div>
+          )}
 
           <div>
             <label className="text-sm font-medium text-gray-700">Location</label>
@@ -249,12 +302,17 @@ const BookingForm = ({ photographerName, photographerId }) => {
               required
               className="mt-1"
             />
+            {photographer?.location && (
+              <p className="text-sm text-gray-500 mt-1">
+                Default location: {photographer.location}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      <Button type="submit" className="w-full mt-8">
-        Confirm Booking
+      <Button type="submit" className="w-full">
+        {user?.currentUser ? 'Confirm Booking' : 'Login to Book'}
       </Button>
     </form>
   );
@@ -286,55 +344,79 @@ const PhotoGrid = ({ images }) => (
   </div>
 );
 
-const ProfileHeader = ({ name, location, experience, image, status }) => (
-  
-  <Card className="mt-8">
-    <CardContent className="flex flex-col md:flex-row items-center gap-6 p-6">
-      <div className="relative">
-        <div className="rounded-full h-32 w-32 overflow-hidden">
-          <img className="w-full h-full object-cover" src={image} alt={name} />
+const ProfileHeader = ({ name, location, experience, image, status, photographer }) => {
+  const navigate = useNavigate();
+  const user = useSelector(state => state.user);
+  const { toast } = useToast();
+
+  const handleBookNowClick = () => {
+    if (!user?.currentUser) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to book a session",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
+  };
+
+  return (
+    <Card className="mt-8">
+      <CardContent className="flex flex-col md:flex-row items-center gap-6 p-6">
+        <div className="relative">
+          <div className="rounded-full h-32 w-32 overflow-hidden">
+            <img className="w-full h-full object-cover" src={image} alt={name} />
+          </div>
+          {status === 'available' && (
+            <div className="absolute -top-2 -right-2 flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
+              <span className="text-sm text-green-700">Available</span>
+              <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+            </div>
+          )}
         </div>
-        {status === 'available' && (
-          <div className="absolute -top-2 -right-2 flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
-            <span className="text-sm text-green-700">Available</span>
-            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-          </div>
-        )}
-      </div>
-      <div className="text-center md:text-left">
-        <h1 className="text-3xl font-bold mb-2">{name}</h1>
-        <div className="flex flex-col md:flex-row gap-4 text-gray-600">
-          <div className="flex items-center gap-2">
-            <Globe size={18} />
-            <span>{location}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Camera size={18} />
-            <span>{experience}</span>
+        <div className="text-center md:text-left">
+          <h1 className="text-3xl font-bold mb-2">{name}</h1>
+          <div className="flex flex-col md:flex-row gap-4 text-gray-600">
+            <div className="flex items-center gap-2">
+              <Globe size={18} />
+              <span>{location}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Camera size={18} />
+              <span>{experience}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="ml-auto">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-              Book Now
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Book {name}</DialogTitle>
-              <DialogDescription>
-                Fill out the form below to book a session with {name}.
-              </DialogDescription>
-            </DialogHeader>
-            <BookingForm />
-          </DialogContent>
-        </Dialog>
-      </div>
-    </CardContent>
-  </Card>
-);
+        <div className="ml-auto">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button 
+                size="lg" 
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={handleBookNowClick}
+              >
+                Book Now
+              </Button>
+            </DialogTrigger>
+            {user?.currentUser && (
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>Book {name}</DialogTitle>
+                  <DialogDescription>
+                    Fill out the form below to book a session with {name}.
+                    <span className="block mt-1">Rate: {photographer.priceRange}</span>
+                  </DialogDescription>
+                </DialogHeader>
+                <BookingForm photographer={photographer} />
+              </DialogContent>
+            )}
+          </Dialog>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const QuickContact = ({ phone }) => (
   <div className="fixed bottom-6 right-6 flex flex-col gap-3">
@@ -361,7 +443,7 @@ const Photographer_Details = () => {
   useEffect(() => {
     const fetchPhotographer = async () => {
       try {
-        const response = await publicRequest.get(`photographers/find/${id}`);
+        const response = await userRequest.get(`photographers/find/${id}`);
         setPhotographer(response.data);
         setLoading(false);
       } catch (err) {
@@ -373,6 +455,8 @@ const Photographer_Details = () => {
 
     fetchPhotographer();
   }, [id]);
+
+  console.log('photograher',photographer)
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
@@ -390,6 +474,7 @@ const Photographer_Details = () => {
           experience={`${photographer.experienceYears} years of experience`}
           image={photographer.profilePic}
           status={photographer.status}
+          photographer={photographer}
         />
 
         <Tabs defaultValue="about" className="mt-8">

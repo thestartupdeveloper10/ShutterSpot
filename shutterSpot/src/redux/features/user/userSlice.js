@@ -45,6 +45,15 @@ const userSlice = createSlice({
     updateUser: (state, action) => {
       state.currentUser = action.payload;
     },
+    updateUserBookings: (state, action) => {
+      if (state.currentUser) {
+        // Add the new booking to the current user's bookings array
+        state.currentUser.bookings = [
+          ...state.currentUser.bookings,
+          action.payload
+        ];
+      }
+    }
   },
 });
 
@@ -58,6 +67,7 @@ export const {
   registerFailure,
   resetError,
   updateUser,
+  updateUserBookings
 } = userSlice.actions;
 
 export const selectCurrentUser = (state) => state.user.currentUser;
