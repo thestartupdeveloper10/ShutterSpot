@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -10,67 +10,222 @@ import {
   Check, 
   Circle, 
   Search,
-  Phone,
-  Video,
   MoreVertical,
   Send,
   Image as ImageIcon,
   ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import io from 'socket.io-client';
+import { useSelector } from 'react-redux';
+import { selectUserId } from '@/redux/features/user/userSlice';
 
 const Messages = () => {
-  const [chats, setChats] = useState([
-    { 
-      id: 1, 
-      name: 'Sarah Johnson',
-      avatar: '/avatars/sarah.jpg',
-      online: true,
-      unread: 2,
-      lastMessage: "When can we ...",
-      lastMessageTime: new Date(2024, 0, 15, 14, 30),
-      messages: [
-        { 
-          text: 'Hello, Im interested in booking a photo session', 
-          sender: 'client',
-          timestamp: new Date(2024, 0, 15, 14, 25),
-          read: true
-        },
-        { 
-          text: 'When can we schedule the shoot?', 
-          sender: 'client',
-          timestamp: new Date(2024, 0, 15, 14, 30),
-          read: false
-        }
-      ]
-    },
-    // ...more chats
-  ]);
+  const socketRef = useRef();
+  const userId = useSelector(selectUserId);
+  
+  const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileView, setIsMobileView] = useState(false);
 
+  useEffect(() => {
+    // Connect to socket server with credentials
+    socketRef.current = io(import.meta.env.VITE_BACKEND_URL, {
+      withCredentials: true,
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+
+    const connectSocket = () => {
+      console.log('Attempting to connect socket with ID:', userId);
+      
+      socketRef.current.on('connect', () => {
+        console.log('Client socket connected');
+        // Join with user ID after successful connection
+        socketRef.current.emit('join', userId);
+      });
+
+      socketRef.current.on('connect_error', (error) => {
+        console.error('Client socket connection error:', error);
+      });
+
+      socketRef.current.on('disconnect', () => {
+        console.log('Socket disconnected, attempting to reconnect...');
+      });
+    };
+
+    if (userId) {
+      connectSocket();
+    }
+
+    // Load chat history
+    const loadChatHistory = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/${userId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const chatData = await response.json();
+        setChats(chatData);
+      } catch (error) {
+        console.error('Error loading chat history:', error);
+      }
+    };
+
+    if (userId) {
+      loadChatHistory();
+    }
+
+    // Listen for private messages
+    socketRef.current.on('private_message', (message) => {
+      console.log('Received message:', message);
+      setChats(prevChats => {
+        const updatedChats = prevChats.map(chat => {
+          if (chat.id === message.from) {
+            return {
+              ...chat,
+              messages: [...chat.messages, {
+                text: message.content,
+                sender: 'photographer',
+                timestamp: new Date(message.createdAt),
+                read: false
+              }],
+              lastMessage: message.content,
+              lastMessageTime: new Date(message.createdAt)
+            };
+          }
+          return chat;
+        });
+        return updatedChats;
+      });
+    });
+
+    // Listen for user status changes
+    socketRef.current.on('userStatus', ({ userId: statusUserId, status }) => {
+      setChats(prevChats => {
+        return prevChats.map(chat => {
+          if (chat.id === statusUserId) {
+            return { ...chat, online: status === 'online' };
+          }
+          return chat;
+        });
+      });
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    const messageContainer = document.querySelector('.messages-container');
+    if (messageContainer && activeChat?.messages?.length > 0) {
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+  }, [activeChat?.messages]);
+
+  // Add function to mark messages as read
+  const markMessagesAsRead = async (senderId) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/${senderId}/read`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ receiverId: userId })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
+  // Update the chat click handler
+  const handleChatClick = (chat) => {
+    setActiveChat(chat);
+    setIsMobileView(window.innerWidth < 640);
+    
+    if (chat.unread > 0) {
+      // Update UI immediately
+      setChats(prevChats => {
+        return prevChats.map(c => {
+          if (c.id === chat.id) {
+            return {
+              ...c,
+              unread: 0
+            };
+          }
+          return c;
+        });
+      });
+      
+      // Update backend
+      markMessagesAsRead(chat.id);
+    }
+  };
+
   const handleSendMessage = () => {
     if (newMessage.trim() && activeChat) {
-      const updatedChats = chats.map(chat => {
-        if (chat.id === activeChat.id) {
-          return {
-            ...chat,
-            messages: [...chat.messages, { 
-              text: newMessage, 
-              sender: 'photographer',
-              timestamp: new Date(),
-              read: false
-            }],
-            lastMessage: newMessage,
-            lastMessageTime: new Date()
-          };
-        }
-        return chat;
+      // Store message text before clearing input
+      const messageText = newMessage;
+      const timestamp = new Date();
+
+      // Create message object
+      const messageObj = {
+        text: messageText,
+        sender: 'client',
+        timestamp: timestamp,
+        read: false
+      };
+
+      // Update local state immediately
+      setChats(prevChats => {
+        const updatedChats = prevChats.map(chat => {
+          if (chat.id === activeChat.id) {
+            return {
+              ...chat,
+              messages: [...chat.messages, messageObj],
+              lastMessage: messageText,
+              lastMessageTime: timestamp
+            };
+          }
+          return chat;
+        });
+        return updatedChats;
       });
-      setChats(updatedChats);
+
+      // Also update activeChat immediately
+      setActiveChat(prev => ({
+        ...prev,
+        messages: [...prev.messages, messageObj],
+        lastMessage: messageText,
+        lastMessageTime: timestamp
+      }));
+
+      // Send message through socket
+      socketRef.current.emit('private_message', {
+        content: messageText,
+        to: activeChat.id
+      });
+
+      // Clear input after sending
       setNewMessage('');
+
+      // Auto-scroll to bottom
+      const messageContainer = document.querySelector('.messages-container');
+      if (messageContainer) {
+        setTimeout(() => {
+          messageContainer.scrollTop = messageContainer.scrollHeight;
+        }, 100);
+      }
     }
   };
 
@@ -97,10 +252,7 @@ const Messages = () => {
           {chats.map(chat => (
             <div
               key={chat.id}
-              onClick={() => {
-                setActiveChat(chat);
-                setIsMobileView(window.innerWidth < 640);
-              }}
+              onClick={() => handleChatClick(chat)}
               className={`p-3 sm:p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
                 activeChat?.id === chat.id ? 'bg-purple-50' : ''
               }`}
@@ -108,7 +260,7 @@ const Messages = () => {
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <div className="relative">
                   <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
-                    <AvatarImage src={chat.avatar} />
+                    <AvatarImage className='object-cover' src={chat.avatar} />
                     <AvatarFallback>{chat.name[0]}</AvatarFallback>
                   </Avatar>
                   {chat.online && (
@@ -156,7 +308,7 @@ const Messages = () => {
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <Avatar className="w-10 h-10">
-                  <AvatarImage src={activeChat.avatar} />
+                  <AvatarImage className='object-cover' src={activeChat.avatar} />
                   <AvatarFallback>{activeChat.name[0]}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -167,12 +319,6 @@ const Messages = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 sm:space-x-4">
-                <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-                </Button>
-                <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                  <Video className="w-4 h-4 sm:w-5 sm:h-5" />
-                </Button>
                 <Button variant="ghost" size="icon">
                   <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
@@ -180,17 +326,17 @@ const Messages = () => {
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-3 sm:p-4">
+            <ScrollArea className="flex-1 p-3 sm:p-4 messages-container">
               <div className="space-y-3 sm:space-y-4">
                 {activeChat.messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex ${message.sender === 'photographer' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${message.sender === 'client' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div className="flex flex-col max-w-[85%] sm:max-w-[75%] md:max-w-[70%] space-y-1">
                       <div
                         className={`p-3 rounded-lg ${
-                          message.sender === 'photographer' 
+                          message.sender === 'client' 
                             ? 'bg-purple-600 text-white rounded-br-none' 
                             : 'bg-gray-100 text-gray-800 rounded-bl-none'
                         }`}
@@ -198,12 +344,12 @@ const Messages = () => {
                         {message.text}
                       </div>
                       <div className={`flex items-center space-x-2 text-xs ${
-                        message.sender === 'photographer' ? 'justify-end' : 'justify-start'
+                        message.sender === 'client' ? 'justify-end' : 'justify-start'
                       }`}>
                         <span className="text-gray-500">
                           {format(message.timestamp, 'HH:mm')}
                         </span>
-                        {message.sender === 'photographer' && (
+                        {message.sender === 'client' && (
                           <span className="text-gray-500">
                             {message.read ? <CheckCheck className="w-4 h-4" /> : <Check className="w-4 h-4" />}
                           </span>

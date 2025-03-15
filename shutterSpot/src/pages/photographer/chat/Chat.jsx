@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -10,67 +10,224 @@ import {
   Check, 
   Circle, 
   Search,
-  Phone,
-  Video,
   MoreVertical,
   Send,
   Image as ImageIcon,
   ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import io from 'socket.io-client';
+import { useSelector } from 'react-redux';
+import { selectUserId } from '@/redux/features/user/userSlice';
 
 const Chat = () => {
-  const [chats, setChats] = useState([
-    { 
-      id: 1, 
-      name: 'Sarah Johnson',
-      avatar: '/avatars/sarah.jpg',
-      online: true,
-      unread: 2,
-      lastMessage: "When can we ...",
-      lastMessageTime: new Date(2024, 0, 15, 14, 30),
-      messages: [
-        { 
-          text: 'Hello, Im interested in booking a photo session', 
-          sender: 'client',
-          timestamp: new Date(2024, 0, 15, 14, 25),
-          read: true
-        },
-        { 
-          text: 'When can we schedule the shoot?', 
-          sender: 'client',
-          timestamp: new Date(2024, 0, 15, 14, 30),
-          read: false
-        }
-      ]
-    },
-    // ...more chats
-  ]);
+  const socketRef = useRef();
+  const userId = useSelector(selectUserId);
+  
+  const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileView, setIsMobileView] = useState(false);
 
+  useEffect(() => {
+    // Connect to socket server with credentials
+    socketRef.current = io(import.meta.env.VITE_BACKEND_URL, {
+      withCredentials: true,
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+
+    const connectSocket = () => {
+      console.log('Attempting to connect socket with ID:', userId);
+      
+      socketRef.current.on('connect', () => {
+        console.log('Photographer socket connected');
+        // Join with user ID after successful connection
+        socketRef.current.emit('join', userId);
+      });
+
+      socketRef.current.on('connect_error', (error) => {
+        console.error('Photographer socket connection error:', error);
+      });
+
+      socketRef.current.on('disconnect', () => {
+        console.log('Socket disconnected, attempting to reconnect...');
+      });
+    };
+
+    if (userId) {
+      connectSocket();
+    }
+
+    // Load chat history
+    const loadChatHistory = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/${userId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const chatData = await response.json();
+        setChats(chatData);
+      } catch (error) {
+        console.error('Error loading chat history:', error);
+      }
+    };
+
+    if (userId) {
+      loadChatHistory();
+    }
+
+    // Listen for private messages
+    socketRef.current.on('private_message', (message) => {
+      console.log('Photographer received message:', message);
+      setChats(prevChats => {
+        const updatedChats = prevChats.map(chat => {
+          if (chat.id === message.from) {
+            const newMessage = {
+              text: message.content,
+              sender: 'client',
+              timestamp: new Date(message.createdAt),
+              read: false
+            };
+            return {
+              ...chat,
+              messages: [...chat.messages, newMessage],
+              lastMessage: message.content,
+              lastMessageTime: new Date(message.createdAt),
+              unread: chat.unread + 1
+            };
+          }
+          return chat;
+        });
+        return updatedChats;
+      });
+    });
+
+    // Listen for user status changes
+    socketRef.current.on('userStatus', ({ userId: statusUserId, status }) => {
+      setChats(prevChats => {
+        return prevChats.map(chat => {
+          if (chat.id === statusUserId) {
+            return { ...chat, online: status === 'online' };
+          }
+          return chat;
+        });
+      });
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    const messageContainer = document.querySelector('.messages-container');
+    if (messageContainer && activeChat?.messages?.length > 0) {
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+  }, [activeChat?.messages]);
+
+  // Add function to mark messages as read
+  const markMessagesAsRead = async (senderId) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/${senderId}/read`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ receiverId: userId })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
+  // Update the chat click handler
+  const handleChatClick = (chat) => {
+    setActiveChat(chat);
+    setIsMobileView(window.innerWidth < 640);
+    
+    if (chat.unread > 0) {
+      // Update UI immediately
+      setChats(prevChats => {
+        return prevChats.map(c => {
+          if (c.id === chat.id) {
+            return {
+              ...c,
+              unread: 0
+            };
+          }
+          return c;
+        });
+      });
+      
+      // Update backend
+      markMessagesAsRead(chat.id);
+    }
+  };
+
   const handleSendMessage = () => {
     if (newMessage.trim() && activeChat) {
-      const updatedChats = chats.map(chat => {
-        if (chat.id === activeChat.id) {
-          return {
-            ...chat,
-            messages: [...chat.messages, { 
-              text: newMessage, 
-              sender: 'photographer',
-              timestamp: new Date(),
-              read: false
-            }],
-            lastMessage: newMessage,
-            lastMessageTime: new Date()
-          };
-        }
-        return chat;
+      // Store message text before clearing input
+      const messageText = newMessage;
+      const timestamp = new Date();
+
+      // Create message object
+      const messageObj = {
+        text: messageText,
+        sender: 'photographer',
+        timestamp: timestamp,
+        read: false
+      };
+
+      // Update local state immediately
+      setChats(prevChats => {
+        const updatedChats = prevChats.map(chat => {
+          if (chat.id === activeChat.id) {
+            return {
+              ...chat,
+              messages: [...chat.messages, messageObj],
+              lastMessage: messageText,
+              lastMessageTime: timestamp
+            };
+          }
+          return chat;
+        });
+        return updatedChats;
       });
-      setChats(updatedChats);
+
+      // Also update activeChat immediately
+      setActiveChat(prev => ({
+        ...prev,
+        messages: [...prev.messages, messageObj],
+        lastMessage: messageText,
+        lastMessageTime: timestamp
+      }));
+
+      // Send message through socket
+      socketRef.current.emit('private_message', {
+        content: messageText,
+        to: activeChat.id
+      });
+
+      // Clear input after sending
       setNewMessage('');
+
+      // Auto-scroll to bottom
+      const messageContainer = document.querySelector('.messages-container');
+      if (messageContainer) {
+        setTimeout(() => {
+          messageContainer.scrollTop = messageContainer.scrollHeight;
+        }, 100);
+      }
     }
   };
 
@@ -97,10 +254,7 @@ const Chat = () => {
           {chats.map(chat => (
             <div
               key={chat.id}
-              onClick={() => {
-                setActiveChat(chat);
-                setIsMobileView(window.innerWidth < 640);
-              }}
+              onClick={() => handleChatClick(chat)}
               className={`p-3 sm:p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
                 activeChat?.id === chat.id ? 'bg-purple-50' : ''
               }`}
@@ -167,12 +321,6 @@ const Chat = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 sm:space-x-4">
-                <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-                </Button>
-                <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                  <Video className="w-4 h-4 sm:w-5 sm:h-5" />
-                </Button>
                 <Button variant="ghost" size="icon">
                   <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
@@ -180,7 +328,7 @@ const Chat = () => {
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-3 sm:p-4">
+            <ScrollArea className="flex-1 p-3 sm:p-4 messages-container">
               <div className="space-y-3 sm:space-y-4">
                 {activeChat.messages.map((message, index) => (
                   <div
