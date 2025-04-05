@@ -9,13 +9,6 @@ const ShuffleHeroImgs = () => {
     <div className="w-full">
       <section className="w-full h-full px-8 py-2 grid grid-cols-1 md:grid-cols-2 items-center gap-8 max-w-8xl mx-auto">
       <div className="">
-       
-        {/* <p className="text-base md:text-lg text-slate-700 my-4 md:my-6">
-        Dive into an ever-changing world of visual inspiration with our dynamic photo gallery. From breathtaking landscapes to captivating portraits, explore a diverse range of images that continually refresh and inspire. Immerse yourself in the beauty of photography, where every visit unveils new perspectives and endless possibilities.
-        </p> */}
-        {/* <button className="bg-indigo-500 text-white font-medium py-2 px-4 rounded transition-all hover:bg-indigo-600 active:scale-95">
-          Find a class
-        </button> */}
       < Formbook />
       </div>
       <ShuffleGrid />

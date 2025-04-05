@@ -99,7 +99,7 @@ const CustomerProfile = () => {
         <CardContent className="flex flex-col md:flex-row items-start gap-6 p-6">
           <div className="relative group">
             <img
-              src={profile.profilePic || "https://via.placeholder.com/150"}
+              src={profile.profilePic || "https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?t=st=1743181110~exp=1743184710~hmac=185145bf510c93eabbf4d8dec2bd3e1cf30dd2c90cec190d395115dad9d8f3e9&w=826"}
               alt={username}
               className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
             />

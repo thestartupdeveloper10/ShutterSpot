@@ -8,7 +8,7 @@ const wishlistSlice = createSlice({
   name: "wishlist",
   initialState,
   reducers: {
-    addProductWishlist: (state, action) => {
+    addPhotographerToWishlist: (state, action) => {
       const { userId } = action.payload;
       if (!state.wishlists[userId]) {
         state.wishlists[userId] = {
@@ -17,24 +17,30 @@ const wishlistSlice = createSlice({
         };
       }
       state.wishlists[userId].wishQuantity += 1;
-      state.wishlists[userId].products.push(action.payload);
+      state.wishlists[userId].products.push({
+        product: action.payload.product,
+        quantity: action.payload.quantity
+      });
     },
-    removeProductWishlist: (state, action) => {
-      const { userId, productId } = action.payload;
+    removePhotographerFromWishlist: (state, action) => {
+      const { userId, photographerId } = action.payload;
       if (state.wishlists[userId]) {
-        const productIndex = state.wishlists[userId].products.findIndex(
-          (product) => product.product._id === productId
+        const photographerIndex = state.wishlists[userId].products.findIndex(
+          (item) => item.product.id === photographerId
         );
-        if (productIndex !== -1) {
+        if (photographerIndex !== -1) {
           state.wishlists[userId].wishQuantity -= 1;
-          state.wishlists[userId].products.splice(productIndex, 1);
+          state.wishlists[userId].products.splice(photographerIndex, 1);
         }
       }
     },
   },
 });
 
-export const { addProductWishlist, removeProductWishlist } = wishlistSlice.actions;
+export const { 
+  addPhotographerToWishlist, 
+  removePhotographerFromWishlist 
+} = wishlistSlice.actions;
 
 // Selectors
 export const selectWishlistItems = (state, userId) =>

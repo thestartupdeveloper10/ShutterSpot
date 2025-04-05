@@ -14,6 +14,7 @@ import storage from "redux-persist/lib/storage";
 import userReducer from "../features/user/userSlice";
 import photographerReducer from "../features/photographer/photographerSlice";
 import bookingReducer from "../features/booking/bookingSlice";
+import wishlistReducer from "../features/favorites/wishlistRedux";
 
 const persistConfig = {
   key: "root",
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   photographer: photographerReducer,
   booking: bookingReducer,
+  wishlist: wishlistReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

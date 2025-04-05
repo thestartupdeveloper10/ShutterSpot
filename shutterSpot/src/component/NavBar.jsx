@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Menu, X, Bell, Heart, MessageSquare, User, LogOut } from 'lucide-react';
 import { logout } from '../redux/features/user/userSlice';
+import logoImg from '@/assets/imgs/logo/logo.png'
+import { selectWishlistItems } from '@/redux/features/favorites/wishlistRedux';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +14,7 @@ const NavBar = () => {
   const user = useSelector((state) => state.user);
   const isClient = user?.currentUser?.role === 'client';
   const isLoggedIn = Boolean(user?.currentUser);
+  const wishlist = useSelector((state) => selectWishlistItems(state, user?.currentUser?._id));
 
   const clientNavItems = [
     { name: 'Home', path: '/' },
@@ -28,7 +31,16 @@ const NavBar = () => {
     { 
       name: 'Favorites', 
       path: '/favourites',
-      icon: <Heart className="w-5 h-5" /> 
+      icon: (
+        <div className="relative">
+          <Heart className="w-5 h-5" />
+          {wishlist.wishQuantity > 0 && (
+            <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              {wishlist.wishQuantity}
+            </span>
+          )}
+        </div>
+      )
     },
     { 
       name: 'Notifications', 
@@ -48,8 +60,9 @@ const NavBar = () => {
         <div className="flex justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-2xl font-bold text-purple-600">
-              ShutterSpot
+            <Link to="/" className="flex items-center">
+              <img src={logoImg} alt="logo" className='h-16 w-16 object-cover'  />
+              <h1 className="text-xl md:text-2xl font-bold text-purple-500">PichaKonnect</h1>
             </Link>
           </div>
 
@@ -139,7 +152,7 @@ const NavBar = () => {
                 <div className="flex items-center space-x-3 px-3 py-2 rounded-md bg-gray-50">
                   <Link to={'/profile'}>
                   <img 
-                    src={user.currentUser.profilePicture || 'https://via.placeholder.com/32'} 
+                    src={user.currentUser.profile.profilePic || 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?t=st=1743181110~exp=1743184710~hmac=185145bf510c93eabbf4d8dec2bd3e1cf30dd2c90cec190d395115dad9d8f3e9&w=826'} 
                     alt={user.currentUser.username}
                     className="w-8 h-8 rounded-full object-cover"
                   />
@@ -243,7 +256,7 @@ const NavBar = () => {
                 <div className="flex items-center justify-between px-3 py-2 mt-2 rounded-md bg-gray-50">
                   <div className="flex items-center space-x-3">
                     <img 
-                      src={user.currentUser.profilePicture || 'https://via.placeholder.com/32'} 
+                      src={user.currentUser.profile.profilePic || 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?t=st=1743181110~exp=1743184710~hmac=185145bf510c93eabbf4d8dec2bd3e1cf30dd2c90cec190d395115dad9d8f3e9&w=826'} 
                       alt={user.currentUser.username}
                       className="w-8 h-8 rounded-full object-cover"
                     />

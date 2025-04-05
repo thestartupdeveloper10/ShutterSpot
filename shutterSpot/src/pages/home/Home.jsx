@@ -10,6 +10,7 @@ import InfoCardGrid from './InfoCard';
 
 
 
+
 const Home = () => {
 
 
@@ -20,7 +21,7 @@ const Home = () => {
                 
         <div>    
         <div className="h-[70dvh] md:h-[70dvh] lg:h-screen items-center flex justify-center rounded-md relative ">
-            <img src='https://cdn.pixabay.com/photo/2022/05/22/16/34/woman-7213852_960_720.jpg' className='bg-cover h-full w-fit md:w-full object-cover' alt="" />
+            <img src='https://images.pexels.com/photos/307008/pexels-photo-307008.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' className='bg-cover h-full w-auto md:w-full object-cover' alt="" />
             <div className="absolute md:left-10  lg:left-[155px] left-10 overal flex gap-10 md:gap-3 md:w-[500px] w-[300px]  rounded-md items-start justify-center flex-col text-white">
                 <div className="text flex flex-col md:gap-2 gap-6 items-center">
                     <h1 className="md:text-[50px] text-[30px] font-extrabold text-start max-w-[800px]">Extraordinarily natural and cultural charm</h1>

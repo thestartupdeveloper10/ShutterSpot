@@ -53,7 +53,20 @@ const userSlice = createSlice({
           action.payload
         ];
       }
-    }
+    },
+    tokenExpired: (state) => {
+      state.currentUser = null;
+      state.userId = null;
+      state.error = true;
+    },
+    updateUserProfile: (state, action) => {
+      if (state.currentUser) {
+        state.currentUser = {
+          ...state.currentUser,
+          profile: action.payload
+        };
+      }
+    },
   },
 });
 
@@ -67,7 +80,9 @@ export const {
   registerFailure,
   resetError,
   updateUser,
-  updateUserBookings
+  updateUserBookings,
+  tokenExpired,
+  updateUserProfile
 } = userSlice.actions;
 
 export const selectCurrentUser = (state) => state.user.currentUser;

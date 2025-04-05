@@ -257,4 +257,68 @@ photographerRouter.get("/category/:category", async (req, res, next) => {
   }
 });
 
+// Update the search endpoint
+photographerRouter.get("/search", async (req, res, next) => {
+  try {
+    const { date, location } = req.query;
+    
+    console.log('Search params:', { date, location });
+
+    // Base query with correct relation name
+    const query = {
+      where: {},
+      include: {
+        receivedBookings: {  // Changed from 'bookings' to 'receivedBookings'
+          where: {
+            status: {
+              in: ['pending', 'confirmed']
+            }
+          }
+        },
+        user: {
+          select: {
+            email: true
+          }
+        }
+      }
+    };
+
+    // Add location filter if provided
+    if (location && location.trim() !== '') {
+      query.where.location = {
+        contains: location.trim(),
+        mode: 'insensitive'
+      };
+    }
+
+    // Execute query
+    let photographers = await prisma.photographer.findMany(query);
+    
+    // Filter by date availability if date is provided
+    if (date) {
+      const searchDate = new Date(date);
+      photographers = photographers.filter(photographer => {
+        // Check if photographer has any conflicting bookings on this date
+        return !photographer.receivedBookings.some(booking => {  // Changed from 'bookings' to 'receivedBookings'
+          const bookingDate = new Date(booking.startDate);
+          return bookingDate.toDateString() === searchDate.toDateString();
+        });
+      });
+    }
+
+    // Clean up the response data
+    const cleanedPhotographers = photographers.map(({ receivedBookings, ...photographer }) => ({  // Changed from 'bookings' to 'receivedBookings'
+      ...photographer,
+      isAvailable: true
+    }));
+
+    console.log(`Found ${cleanedPhotographers.length} photographers`);
+    res.status(200).json(cleanedPhotographers);
+
+  } catch (err) {
+    console.error('Search error:', err);
+    next(createError(500, "Error searching photographers: " + err.message));
+  }
+});
+
 module.exports = photographerRouter;

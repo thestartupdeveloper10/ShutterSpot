@@ -62,3 +62,31 @@ publicRequest.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Add a response interceptor to handle token expiration
+userRequest.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 403 && error.response.data === "Token is not valid!") {
+      // Clear local storage
+      localStorage.removeItem("persist:root");
+      // Redirect to login page
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Update the public request interceptor to also handle token expiration
+publicRequest.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 403 && error.response.data === "Token is not valid!") {
+      // Clear local storage
+      localStorage.removeItem("persist:root");
+      // Redirect to login page
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);

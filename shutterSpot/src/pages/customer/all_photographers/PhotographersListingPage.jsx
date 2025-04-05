@@ -7,16 +7,21 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Filter } from "lucide-react";
-import NavBar from '@/component/NavBar';
-import Footer from '@/component/Footer';
 import { publicRequest } from '@/service/requestMethods';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+  addPhotographerToWishlist, 
+  removePhotographerFromWishlist, 
+  selectWishlistItems 
+} from '@/redux/features/favorites/wishlistRedux';
+import { Heart } from "lucide-react";
 
 // Helper function to extract price range values
 const extractPriceRange = (priceString) => {
   // For Kenyan Shilling format
   const numbers = priceString.match(/\d+/g);
-  return numbers ? [parseInt(numbers[0]), parseInt(numbers[1]) || parseInt(numbers[0]) + 1000] : [0, 5000];
+  return numbers ? [parseInt(numbers[0]), parseInt(numbers[1]) || parseInt(numbers[0]) + 10000] : [0, 50000];
 };
 
 // Helper function to get unique values from array of objects
@@ -52,15 +57,19 @@ const FilterPanel = ({
       
       {/* Price Range Filter */}
       <div>
-        <Label>Price Range (USD)</Label>
+        <Label>Price Range (KSH)</Label>
         <div className="flex justify-between mb-2">
-          <span>${priceRange[0]}</span>
-          <span>${priceRange[1]}</span>
+          <span className="text-sm text-gray-600">
+            KSH {priceRange[0].toLocaleString()}
+          </span>
+          <span className="text-sm text-gray-600">
+            KSH {priceRange[1].toLocaleString()}
+          </span>
         </div>
         <Slider
           min={minPrice}
           max={maxPrice}
-          step={100}
+          step={1000}
           value={priceRange}
           onValueChange={setPriceRange}
           className="mt-4"
@@ -69,9 +78,9 @@ const FilterPanel = ({
 
       {/* Location Filter */}
       <div className="mt-6">
-        <Label>Location</Label>
+        <Label className="text-sm font-medium">Location</Label>
         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-          <SelectTrigger className="mt-2">
+          <SelectTrigger className="mt-2 w-full bg-white">
             <SelectValue placeholder="Select a location" />
           </SelectTrigger>
           <SelectContent>
@@ -85,8 +94,8 @@ const FilterPanel = ({
 
       {/* Availability Filter */}
       <div className="mt-6">
-        <Label>Availability</Label>
-        <div className="space-y-2 mt-2">
+        <Label className="text-sm font-medium mb-2 block">Availability</Label>
+        <div className="space-y-3 mt-2">
           {['Weekends', 'Weekdays', 'Flexible for travel'].map(availability => (
             <div key={availability} className="flex items-center space-x-2">
               <Checkbox 
@@ -95,8 +104,14 @@ const FilterPanel = ({
                 onCheckedChange={(checked) => 
                   setSelectedAvailability(prev => ({ ...prev, [availability]: checked }))
                 }
+                className="rounded-sm"
               />
-              <label htmlFor={availability}>{availability}</label>
+              <label 
+                htmlFor={availability} 
+                className="text-sm text-gray-600 cursor-pointer"
+              >
+                {availability}
+              </label>
             </div>
           ))}
         </div>
@@ -104,8 +119,8 @@ const FilterPanel = ({
 
       {/* Services Filter */}
       <div className="mt-6">
-        <Label>Services</Label>
-        <div className="space-y-2 mt-2">
+        <Label className="text-sm font-medium mb-2 block">Services</Label>
+        <div className="space-y-3 mt-2">
           {services.map(service => (
             <div key={service} className="flex items-center space-x-2">
               <Checkbox 
@@ -114,8 +129,14 @@ const FilterPanel = ({
                 onCheckedChange={(checked) => 
                   setSelectedServices(prev => ({ ...prev, [service]: checked }))
                 }
+                className="rounded-sm"
               />
-              <label htmlFor={service}>{service}</label>
+              <label 
+                htmlFor={service} 
+                className="text-sm text-gray-600 cursor-pointer"
+              >
+                {service}
+              </label>
             </div>
           ))}
         </div>
@@ -125,9 +146,41 @@ const FilterPanel = ({
 );
 
 const PhotographerCard = ({ photographer }) => {
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
+  const wishlist = useSelector((state) => selectWishlistItems(state, currentUser?._id));
+
+  const isPhotographerInWishlist = (photographerId) => {
+    return wishlist.products.some(
+      (item) => item.product.id === photographerId
+    );
+  };
+
+  const handleFavorite = (e) => {
+    e.preventDefault(); // Prevent card click event
+    if (!currentUser) {
+      alert("Please login to add favorites");
+      return;
+    }
+
+    const photographerId = photographer.id;
+    const isFavorited = isPhotographerInWishlist(photographerId);
+
+    if (isFavorited) {
+      dispatch(removePhotographerFromWishlist({
+        userId: currentUser._id,
+        photographerId: photographerId
+      }));
+    } else {
+      dispatch(addPhotographerToWishlist({
+        userId: currentUser._id,
+        product: photographer,
+        quantity: 1
+      }));
+    }
+  };
+
   const [minPrice, maxPrice] = extractPriceRange(photographer.priceRange);
-  console.log(photographer.id)
-  
   return (
     <Card className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       {/* Image Container with Overlay */}
@@ -138,6 +191,22 @@ const PhotographerCard = ({ photographer }) => {
           className="h-72 w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <button
+          onClick={handleFavorite}
+          className={`absolute top-4 right-4 p-2 rounded-full z-10 transition-all duration-300 hover:bg-white
+            ${isPhotographerInWishlist(photographer.id)
+              ? 'bg-white opacity-100'
+              : 'bg-white/80 opacity-0 group-hover:opacity-100'
+            }`}
+        >
+          <Heart 
+            className={`w-5 h-5 transition-colors duration-300 ${
+              isPhotographerInWishlist(photographer.id)
+                ? 'text-pink-500 fill-pink-500'
+                : 'text-pink-500'
+            }`} 
+          />
+        </button>
       </div>
 
       {/* Content Section */}
@@ -212,7 +281,7 @@ const PhotographerCard = ({ photographer }) => {
       </CardContent>
 
       {/* Quick Info Overlay */}
-      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="absolute top-4 left-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         {photographer.cameras && photographer.cameras.length > 0 && (
           <div className="bg-black/70 text-white rounded-full p-2" 
           title={`Cameras: ${photographer.cameras.join(', ')}`}

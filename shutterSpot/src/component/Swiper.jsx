@@ -8,10 +8,50 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Link } from 'react-router-dom';
-import { Star, MapPin, DollarSign } from "lucide-react";
+import { Star, MapPin, DollarSign, Heart } from "lucide-react";
 import { publicRequest } from '@/service/requestMethods';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+  addPhotographerToWishlist, 
+  removePhotographerFromWishlist, 
+  selectWishlistItems 
+} from '@/redux/features/favorites/wishlistRedux';
 
 const PhotographerCard = ({ photographer }) => {
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
+  const wishlist = useSelector((state) => selectWishlistItems(state, currentUser?._id));
+
+  const isPhotographerInWishlist = (photographerId) => {
+    return wishlist.products.some(
+      (item) => item.product.id === photographerId
+    );
+  };
+
+  const handleFavorite = (e, photographer) => {
+    e.preventDefault(); // Prevent card click event
+    if (!currentUser) {
+      alert("Please login to add favorites");
+      return;
+    }
+
+    const photographerId = photographer.id;
+    const isFavorited = isPhotographerInWishlist(photographerId);
+
+    if (isFavorited) {
+      dispatch(removePhotographerFromWishlist({
+        userId: currentUser._id,
+        photographerId: photographerId
+      }));
+    } else {
+      dispatch(addPhotographerToWishlist({
+        userId: currentUser._id,
+        product: photographer,
+        quantity: 1
+      }));
+    }
+  };
+
   // Extract first photo as main image and next 2 as portfolio images
   const mainImage = photographer.profilePic || photographer.photos[0];
   const portfolioImages = photographer.photos.slice(0, 2);
@@ -25,8 +65,24 @@ const PhotographerCard = ({ photographer }) => {
       <CardContent className="p-0">
         <div className="flex flex-col h-full bg-white rounded-md overflow-hidden">
           <div className="grid grid-cols-3 gap-1">
-            <div className='col-span-2'>
+            <div className='col-span-2 relative'>
               <img src={mainImage} className='h-[250px] w-full object-cover' alt={photographer.name} />
+              <button 
+                onClick={(e) => handleFavorite(e, photographer)}
+                className={`absolute top-4 right-4 p-2 rounded-full transition-all duration-300 hover:bg-white
+                  ${isPhotographerInWishlist(photographer.id)
+                    ? 'bg-white opacity-100'
+                    : 'bg-white/80 opacity-0 group-hover:opacity-100'
+                  }`}
+              >
+                <Heart 
+                  className={`w-5 h-5 transition-colors duration-300 ${
+                    isPhotographerInWishlist(photographer.id)
+                      ? 'text-pink-500 fill-pink-500'
+                      : 'text-pink-500'
+                  }`} 
+                />
+              </button>
             </div>
             <div className="flex flex-col gap-1">
               {portfolioImages.map((img, index) => (
@@ -36,8 +92,8 @@ const PhotographerCard = ({ photographer }) => {
               ))}
             </div>
           </div>
-          <div className="px-6 bg-white flex flex-col gap-5 py-4">
-            <div className='h-24 w-24 rounded-full overflow-hidden -mt-16 border-4 border-spacing-2 border-white'>
+          <div className="px-3 bg-white flex flex-col gap-5 py-4">
+            <div className='h-24 w-24 z-20 rounded-full overflow-hidden -mt-16 border-4 border-spacing-2 border-white'>
               <img src={photographer.profilePic} className='h-full w-full object-cover' alt={photographer.name} />
             </div>
             <div className="flex flex-col">
@@ -48,17 +104,17 @@ const PhotographerCard = ({ photographer }) => {
                     <MapPin className="h-4 w-4 mr-1" />
                     {photographer.location}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {photographer.skills.slice(0, 3).map((skill, index) => (
+                  <div className=" flex flex-wrap gap-2">
+                    {photographer.skills.slice(0, 2).map((skill, index) => (
                       <span key={index} className="px-2 py-1 bg-gray-100 rounded-full text-xs">
                         {skill}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 items-end">
+                <div className="flex flex-col gap-2 items-end w-auto">
                   <div className="flex items-center">
-                    <p className='text-xl font-semibold'>{startingPrice}</p>
+                    <p className='text-lg font-semibold'>{startingPrice}</p>
                   </div>
                   <p className='text-sm text-gray-600 flex items-center'>
                     <Star className="h-4 w-4 mr-1 text-yellow-500" />
@@ -91,7 +147,6 @@ export function PhotographerCarousel() {
       setIsLoading(true);
       try {
         const res = await publicRequest.get("photographers");
-        console.log('data', res.data)
         setPhotographers(res.data);
       } catch (err) {
         setError(err.message);
@@ -123,8 +178,8 @@ export function PhotographerCarousel() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="hidden md:flex" />
+        <CarouselNext className="hidden md:flex" />
       </Carousel>
     </div>
   );

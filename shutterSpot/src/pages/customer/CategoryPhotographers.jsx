@@ -4,6 +4,12 @@ import { motion } from 'framer-motion';
 import { Star, MapPin, Camera, Heart, Award, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { publicRequest } from '@/service/requestMethods';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+  addPhotographerToWishlist, 
+  removePhotographerFromWishlist, 
+  selectWishlistItems 
+} from '@/redux/features/favorites/wishlistRedux';
 
 
 const CategoryPhotographers = () => {
@@ -12,6 +18,9 @@ const CategoryPhotographers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all'); // 'all', 'rating', 'experience'
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
+  const wishlist = useSelector((state) => selectWishlistItems(state, currentUser?._id));
 
   useEffect(() => {
     const fetchPhotographers = async () => {
@@ -60,6 +69,35 @@ const CategoryPhotographers = () => {
       transition: {
         duration: 0.5
       }
+    }
+  };
+
+  const isPhotographerInWishlist = (photographerId) => {
+    return wishlist.products.some(
+      (item) => item.product.id === photographerId
+    );
+  };
+
+  const handleFavorite = (photographer) => {
+    if (!currentUser) {
+      alert("Please login to add favorites");
+      return;
+    }
+
+    const photographerId = photographer.id;
+    const isFavorited = isPhotographerInWishlist(photographerId);
+
+    if (isFavorited) {
+      dispatch(removePhotographerFromWishlist({
+        userId: currentUser._id,
+        photographerId: photographerId
+      }));
+    } else {
+      dispatch(addPhotographerToWishlist({
+        userId: currentUser._id,
+        product: photographer,
+        quantity: 1
+      }));
     }
   };
 
@@ -155,8 +193,21 @@ const CategoryPhotographers = () => {
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <button className="absolute top-4 right-4 p-2 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white">
-                    <Heart className="w-5 h-5 text-pink-500" />
+                  <button 
+                    onClick={() => handleFavorite(photographer)}
+                    className={`absolute top-4 right-4 p-2 rounded-full transition-all duration-300 hover:bg-white
+                      ${isPhotographerInWishlist(photographer.id)
+                        ? 'bg-white opacity-100'
+                        : 'bg-white/80 opacity-0 group-hover:opacity-100'
+                      }`}
+                  >
+                    <Heart 
+                      className={`w-5 h-5 transition-colors duration-300 ${
+                        isPhotographerInWishlist(photographer.id)
+                          ? 'text-pink-500 fill-pink-500'
+                          : 'text-pink-500'
+                      }`} 
+                    />
                   </button>
                 </div>
                 <div className="p-6">
@@ -188,11 +239,13 @@ const CategoryPhotographers = () => {
                     >
                       View Profile
                     </Link>
+                    <Link to={`/book/${photographer.id}`}>
                     <button
                       className="px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors duration-300"
                     >
                       Quick Book
                     </button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>

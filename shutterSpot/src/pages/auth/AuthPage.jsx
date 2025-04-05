@@ -86,9 +86,19 @@ const AuthPage = () => {
     try {
       const response = await publicRequest.post('/auth/login', loginForm);
       dispatch(loginSuccess(response.data));
-      response.data.role === 'photographer' 
-        ? navigate(`/photographerProfile/${response.data.id}`) 
-        : navigate('/');
+      
+      // Check if user is a client and if they have a profile
+      if (response.data.role === 'client') {
+       
+        // If profile is null, redirect to profile creation form
+        if (response.data.profile === null) {
+          navigate('/create-profile')
+        } else {
+          navigate('/');
+        }
+      } else if (response.data.role === 'photographer') {
+        navigate(`/photographerProfile/${response.data.id}`);
+      }
     } catch (err) {
       dispatch(loginFailure());
       setError(err.response?.data?.message || 'Invalid email or password');
@@ -96,9 +106,6 @@ const AuthPage = () => {
       setIsLoading(false);
     }
   };
-
-// problems !!
-
 
   const handleRegister = async (e) => {
     e.preventDefault();

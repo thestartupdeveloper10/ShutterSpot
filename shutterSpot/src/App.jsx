@@ -3,20 +3,23 @@ import { useSelector } from 'react-redux';
 import AuthPage from './pages/auth/AuthPage';
 import photographerRoutes from './routes/photographerRoutes';
 import clientRoutes from './routes/clientRoutes';
+import SearchResults from './pages/customer/search/SearchResults';
+
+
 
 function App() {
   const { currentUser } = useSelector((state) => state.user);
   const isPhotographer = currentUser?.role === 'photographer';
-
+  const isClient = currentUser?.role === 'client'
   return (
+    
     <Router>
       <Routes>
         {/* Auth Route */}
         <Route path="/auth" element={!currentUser ? <AuthPage /> : 
-          isPhotographer ? <Navigate to="/photographer/dashboard" replace /> : 
+          isPhotographer ? <Navigate to="/photographer/dashboard" replace /> : currentUser.profile===null ? <Navigate to="/create-profile" replace /> :
           <Navigate to="/" replace />
         } />
-
         {/* Photographer Routes */}
         {photographerRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element}>
@@ -42,6 +45,18 @@ function App() {
             ))}
           </Route>
         ))}
+
+        {/* Booking Route */}
+        {/* <Route path="/booking/:photographerId" element={
+          
+            <BookingPage />
+         
+        } /> */}
+
+        
+
+        {/* Search Results Route */}
+        <Route path="/search-results" element={<SearchResults />} />
 
         {/* Fallback Route */}
         <Route

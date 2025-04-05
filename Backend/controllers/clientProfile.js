@@ -15,10 +15,13 @@ clientRouter.post("/", verifyToken, async (req, res, next) => {
       const { phone, location, profilePic  } = req.body;
       const { id, role } = req.user;
   
-      // Ensure the user is a client, not a photographer
-      const user = await prisma.user.findUnique({ where: { id: id } });
-
-      console.log("User is :", user);
+      // Ensure the user is a client
+      const user = await prisma.user.findUnique({ 
+        where: { id: id },
+        include: {
+          clientProfile: true
+        }
+      });
 
       if (!user || user.role !== 'client') {
         return next(createError(403, 'Only clients can create a profile.'));
@@ -27,22 +30,30 @@ clientRouter.post("/", verifyToken, async (req, res, next) => {
       // Create ClientProfile
       const clientProfile = await prisma.clientProfile.create({
         data: {
-          userId:id,
+          userId: id,
           phone,
           location,
-          profilePic: profilePic
+          profilePic: profilePic || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
         },
       });
-  
+
+      // Return the complete profile data
       res.status(201).json({
         message: 'Client profile created successfully',
-        clientProfile,
+        clientProfile: {
+          ...clientProfile,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email
+          }
+        }
       });
     } catch (error) {
       console.error("Prisma error:", error);
       next(createError(500, 'Error creating client profile'));
     }
-  });
+});
 
 
 // UPDATE

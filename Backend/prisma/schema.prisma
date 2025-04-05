@@ -93,10 +93,22 @@ model Review {
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum Status {
+  pending        // Initial state when booking is created
+  confirmed      // Photographer accepted the booking
+  rejected       // Photographer rejected the booking
+  cancelled      // Either party cancelled the booking
+  completed      // Service was delivered successfully
+  no_show        // Client didn't show up
+  rescheduled    // Booking was rescheduled
+  expired        // Booking expired without confirmation
+  refunded       // Payment was refunded
+}
+
 model Booking {
   id             String       @id @default(uuid())
   photographerId String
-  clientId       String      // Renamed from userId to be more explicit
+  clientId       String      
   startDate      DateTime
   endDate        DateTime
   location       String
@@ -105,15 +117,39 @@ model Booking {
   totalPrice     Float
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+  service        String      @default("Photography Session")
+  
+  // New fields
+  depositPaid    Boolean     @default(false)
+  depositAmount  Float?
+  paymentStatus  PaymentStatus @default(pending)
+  cancellationReason String?
+  rescheduleCount Int       @default(0)
+  lastRescheduleDate DateTime?
+  notes          String?
   
   // Relations
   photographer   Photographer @relation("PhotographerBookings", fields: [photographerId], references: [id], onDelete: Cascade)
-  client        ClientProfile @relation(fields: [clientId], references: [userId], onDelete: Cascade) // Changed to reference ClientProfile directly
+  client        ClientProfile @relation(fields: [clientId], references: [userId], onDelete: Cascade)
+  history       BookingHistory[]
 }
 
-enum Status {
+enum PaymentStatus {
   pending
-  confirmed
-  rejected
-  cancelled
+  deposit_paid
+  fully_paid
+  refunded
+  failed
+}
+
+// New model to track booking history
+model BookingHistory {
+  id            String   @id @default(uuid())
+  bookingId     String
+  status        Status
+  reason        String?
+  changedBy     String
+  timestamp     DateTime @default(now())
+  
+  booking       Booking  @relation(fields: [bookingId], references: [id])
 }

@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import { Calendar, Clock, MapPin, Camera, DollarSign } from 'lucide-react';
+import { Calendar, Clock, MapPin, Camera, DollarSign, AlertCircle } from 'lucide-react';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { userRequest } from '@/service/requestMethods';
+import { useToast } from "@/components/ui/use-toast";
 
 const Mybooking = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const user = useSelector((state) => state.user.currentUser);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -40,6 +44,11 @@ const Mybooking = () => {
       confirmed: "bg-green-100 text-green-800",
       completed: "bg-blue-100 text-blue-800",
       cancelled: "bg-red-100 text-red-800",
+      rejected: "bg-red-100 text-red-800",
+      rescheduled: "bg-purple-100 text-purple-800",
+      no_show: "bg-gray-100 text-gray-800",
+      expired: "bg-gray-100 text-gray-800",
+      refunded: "bg-blue-100 text-blue-800"
     };
     return colors[status.toLowerCase()] || "bg-gray-100 text-gray-800";
   };
@@ -48,6 +57,29 @@ const Mybooking = () => {
     return bookings.filter(booking => 
       status === 'all' ? true : booking.status.toLowerCase() === status.toLowerCase()
     );
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      await userRequest.put(`/book/${bookingId}/status`, {
+        status: 'cancelled',
+        reason: 'Cancelled by client'
+      });
+      
+      toast({
+        title: "Booking Cancelled",
+        description: "Your booking has been cancelled successfully.",
+      });
+      
+      // Refresh bookings
+      fetchBookings();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.error || "Failed to cancel booking",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -63,15 +95,16 @@ const Mybooking = () => {
       <h1 className="text-3xl font-bold mb-6">My Bookings</h1>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-8">
+        <TabsList className="grid w-full grid-cols-6 mb-8">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="pending">Pending</TabsTrigger>
           <TabsTrigger value="confirmed">Confirmed</TabsTrigger>
           <TabsTrigger value="completed">Completed</TabsTrigger>
           <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+          <TabsTrigger value="rescheduled">Rescheduled</TabsTrigger>
         </TabsList>
 
-        {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
+        {['all', 'pending', 'confirmed', 'completed', 'cancelled', 'rescheduled'].map((status) => (
           <TabsContent key={status} value={status}>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filterBookings(status).map((booking) => (
@@ -115,14 +148,56 @@ const Mybooking = () => {
                       </div>
                     </div>
 
-                    {booking.status === 'pending' && (
-                      <div className="pt-4 border-t">
-                        <p className="text-sm text-gray-500">
-                          Waiting for photographer confirmation...
-                        </p>
+                    {/* Add payment status */}
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Payment Status:</span>
+                        <Badge variant="outline" className={
+                          booking.paymentStatus === 'fully_paid' ? 'text-green-600' :
+                          booking.paymentStatus === 'deposit_paid' ? 'text-blue-600' :
+                          'text-yellow-600'
+                        }>
+                          {booking.paymentStatus.replace('_', ' ')}
+                        </Badge>
                       </div>
-                    )}
+                      
+                      {booking.depositAmount && booking.paymentStatus === 'pending' && (
+                        <div className="mt-2">
+                          <Button 
+                            variant="outline" 
+                            className="w-full"
+                            onClick={() => {/* Handle payment */}}
+                          >
+                            Pay Deposit (Ksh {booking.depositAmount})
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
+
+                  <CardFooter className="bg-gray-50 px-6 py-4">
+                    <div className="flex justify-end gap-4 w-full">
+                      {booking.status === 'pending' && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleCancelBooking(booking.id)}
+                        >
+                          Cancel Booking
+                        </Button>
+                      )}
+                      
+                      {booking.status === 'confirmed' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {/* Handle reschedule */}}
+                        >
+                          Request Reschedule
+                        </Button>
+                      )}
+                    </div>
+                  </CardFooter>
                 </Card>
               ))}
 
